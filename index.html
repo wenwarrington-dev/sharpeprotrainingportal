@@ -1,0 +1,1306 @@
+<title>Sharpe Pro Portal</title>
+<meta name="description" content="Sharpe Pro Development's training and certification portal for peer recovery specialists.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand-900:#2C1868;
+    --brand-700:#402291;
+    --brand-600:#4E2CA6;
+    --brand-500:#6343AD;
+    --brand-100:#EEE8FA;
+    --brand-50:#F6F2FC;
+    --gray-900:#201A2E;
+    --gray-700:#4B4655;
+    --gray-500:#706B7A;
+    --gray-300:#D8D3E0;
+    --gray-150:#EAE6F0;
+    --gray-100:#F2EFF7;
+
+    --ink:var(--gray-900);
+    --ink-soft:var(--gray-700);
+    --ink-faint:var(--gray-500);
+    --paper:#FDFCFE;
+    --surface:#FFFFFF;
+    --surface-sunken:var(--gray-100);
+    --border:var(--gray-150);
+    --border-strong:var(--gray-300);
+    --accent:var(--brand-700);
+    --accent-strong:var(--brand-900);
+    --accent-soft:var(--brand-100);
+    --accent-soft-2:var(--brand-50);
+    --focus-ring:#8B72D6;
+
+    --success:#2F8F5B;
+    --success-soft:#E3F3EA;
+    --warning:#B8791E;
+    --warning-soft:#FBF1DF;
+    --critical:#C1402F;
+    --critical-soft:#FAE7E4;
+    --info:var(--brand-600);
+    --info-soft:var(--brand-50);
+
+    --shadow-sm:0 1px 2px rgba(44,24,104,0.06), 0 1px 1px rgba(44,24,104,0.04);
+    --shadow-md:0 8px 24px rgba(44,24,104,0.10), 0 2px 6px rgba(44,24,104,0.06);
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:18px;
+    --font-display:"Fraunces", Georgia, serif;
+    --font-body:"Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#ECE8F5;
+      --ink-soft:#C6C0D6;
+      --ink-faint:#9A93AE;
+      --paper:#150F22;
+      --surface:#1E1730;
+      --surface-sunken:#170F27;
+      --border:#332A4C;
+      --border-strong:#463A63;
+      --accent:#A98BF2;
+      --accent-strong:#C7B2FA;
+      --accent-soft:#2E2350;
+      --accent-soft-2:#241C3D;
+      --focus-ring:#A98BF2;
+      --success:#5FC98B;
+      --success-soft:#1C3327;
+      --warning:#E3A945;
+      --warning-soft:#3A2C14;
+      --critical:#E88477;
+      --critical-soft:#3B211E;
+      --info:#A98BF2;
+      --info-soft:#241C3D;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#ECE8F5;
+    --ink-soft:#C6C0D6;
+    --ink-faint:#9A93AE;
+    --paper:#150F22;
+    --surface:#1E1730;
+    --surface-sunken:#170F27;
+    --border:#332A4C;
+    --border-strong:#463A63;
+    --accent:#A98BF2;
+    --accent-strong:#C7B2FA;
+    --accent-soft:#2E2350;
+    --accent-soft-2:#241C3D;
+    --focus-ring:#A98BF2;
+    --success:#5FC98B;
+    --success-soft:#1C3327;
+    --warning:#E3A945;
+    --warning-soft:#3A2C14;
+    --critical:#E88477;
+    --critical-soft:#3B211E;
+    --info:#A98BF2;
+    --info-soft:#241C3D;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;color:var(--ink);margin:0 0 4px;text-wrap:balance;}
+  p{margin:0 0 10px;color:var(--ink-soft);}
+  a{color:var(--accent);}
+  .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  button{font-family:var(--font-body);}
+  ::selection{background:var(--accent-soft);}
+  :focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;}
+
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  /* ---------- buttons & inputs ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    font-family:var(--font-body);font-weight:600;font-size:14px;
+    padding:10px 16px;border-radius:10px;border:1px solid transparent;
+    cursor:pointer;transition:transform .05s ease, background .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-strong);}
+  .btn-secondary{background:var(--surface);color:var(--ink);border-color:var(--border-strong);}
+  .btn-secondary:hover{border-color:var(--accent);}
+  .btn-ghost{background:transparent;color:var(--ink-soft);}
+  .btn-ghost:hover{background:var(--surface-sunken);color:var(--ink);}
+  .btn-danger{background:transparent;color:var(--critical);border-color:var(--critical);}
+  .btn-danger:hover{background:var(--critical-soft);}
+  .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-block{width:100%;}
+
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 6px;}
+  .field{margin-bottom:16px;}
+  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select,textarea{
+    width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border-strong);
+    background:var(--surface);color:var(--ink);font-family:var(--font-body);font-size:14px;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  .hint{font-size:12.5px;color:var(--ink-faint);margin-top:5px;}
+  .file-drop{
+    border:1.5px dashed var(--border-strong);border-radius:10px;padding:16px;text-align:center;
+    background:var(--surface-sunken);cursor:pointer;font-size:13.5px;color:var(--ink-soft);
+  }
+  .file-drop:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* ---------- layout ---------- */
+  #app{min-height:100vh;}
+  .center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:
+    radial-gradient(1200px 600px at 12% -10%, var(--accent-soft) 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, var(--accent-soft-2) 0%, transparent 55%),
+    var(--paper);}
+  .auth-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-lg);padding:32px 28px;box-shadow:var(--shadow-md);}
+  .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+  .brand-row img{height:48px;width:auto;display:block;}
+  .tab-row{display:flex;gap:4px;background:var(--surface-sunken);padding:4px;border-radius:10px;margin-bottom:20px;}
+  .tab-btn{flex:1;padding:8px 10px;border-radius:7px;border:none;background:transparent;cursor:pointer;
+    font-weight:600;font-size:13.5px;color:var(--ink-faint);}
+  .tab-btn.active{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
+
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{width:230px;flex:none;background:var(--surface);border-right:1px solid var(--border);
+    padding:20px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .brand-row{margin-bottom:4px;padding:0 6px;}
+  .sidebar .brand-row .word{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:.2px;}
+  .sidebar .role-pill{margin:0 6px;}
+  nav.navlist{display:flex;flex-direction:column;gap:2px;}
+  .navlink{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--ink-soft);
+    text-decoration:none;font-weight:600;font-size:13.8px;cursor:pointer;border:none;background:transparent;text-align:left;width:100%;}
+  .navlink:hover{background:var(--surface-sunken);color:var(--ink);}
+  .navlink.active{background:var(--accent-soft);color:var(--accent-strong);}
+  .navlink .ic{width:18px;text-align:center;font-size:15px;}
+  .nav-section-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);
+    font-weight:700;padding:10px 10px 2px;}
+  .sidebar-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);}
+  .who{padding:6px 10px 10px;}
+  .who .name{font-weight:700;font-size:13.5px;}
+  .who .email{font-size:12px;color:var(--ink-faint);}
+
+  .main{flex:1;min-width:0;}
+  .topbar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--border);
+    padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .content{padding:26px 28px 60px;max-width:1080px;}
+
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+  .page-head h1{font-size:26px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+
+  .grid{display:grid;gap:16px;}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:860px){.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;box-shadow:var(--shadow-sm);}
+  .card h3{font-size:15.5px;}
+  .stat-card .stat-label{font-size:12.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;}
+  .stat-card .stat-value{font-family:var(--font-mono);font-size:30px;font-weight:500;color:var(--ink);margin-top:6px;}
+  .stat-card .stat-sub{font-size:12.5px;color:var(--ink-faint);margin-top:4px;}
+
+  .section{margin-bottom:30px;}
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .section-title h2{font-size:18px;}
+
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);
+    padding:0 12px 8px;font-weight:700;}
+  td{padding:12px;font-size:14px;border-top:1px solid var(--border);vertical-align:middle;}
+  tr:hover td{background:var(--surface-sunken);}
+  .table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface);}
+  .table-wrap table{min-width:560px;}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;}
+  .pill-neutral{background:var(--surface-sunken);color:var(--ink-faint);}
+  .pill-success{background:var(--success-soft);color:var(--success);}
+  .pill-warning{background:var(--warning-soft);color:var(--warning);}
+  .pill-critical{background:var(--critical-soft);color:var(--critical);}
+  .pill-info{background:var(--info-soft);color:var(--info);}
+  .pill-brand{background:var(--accent-soft);color:var(--accent-strong);}
+
+  .progress{height:8px;border-radius:99px;background:var(--surface-sunken);overflow:hidden;}
+  .progress > span{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease;}
+  .progress.success > span{background:var(--success);}
+
+  .checklist{display:flex;flex-direction:column;gap:10px;}
+  .check-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--border);
+    border-radius:var(--radius-md);background:var(--surface);}
+  .check-row.done{background:var(--success-soft);border-color:transparent;}
+  .check-badge{width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--border-strong);color:transparent;font-size:14px;margin-top:1px;}
+  .check-row.done .check-badge{background:var(--success);border-color:var(--success);color:#fff;}
+  .check-body{flex:1;min-width:0;}
+  .check-title{font-weight:700;font-size:14.5px;}
+  .check-meta{font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
+  .check-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+
+  .modal-backdrop{position:fixed;inset:0;background:rgba(20,12,38,.45);display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:50;}
+  .modal{background:var(--surface);border-radius:var(--radius-lg);padding:26px;width:100%;max-width:460px;
+    box-shadow:var(--shadow-md);max-height:88vh;overflow-y:auto;}
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .icon-btn{background:none;border:none;font-size:18px;color:var(--ink-faint);cursor:pointer;line-height:1;padding:4px;}
+
+  .toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:80;max-width:340px;}
+  .toast{padding:12px 16px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-md);
+    animation:toastin .18s ease;}
+  .toast.ok{background:var(--success);color:#fff;}
+  .toast.err{background:var(--critical);color:#fff;}
+  @keyframes toastin{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .empty{padding:34px 20px;text-align:center;color:var(--ink-faint);}
+  .divider{height:1px;background:var(--border);margin:18px 0;}
+  .muted{color:var(--ink-faint);font-size:13px;}
+  .mobile-topbar{display:none;}
+  .menu-toggle{display:none;}
+
+  .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(20,12,38,.45);z-index:39;}
+  .sidebar-backdrop.show{display:block;}
+
+  @media (max-width: 780px){
+    .shell{display:block;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .2s ease;
+      z-index:40;box-shadow:var(--shadow-md);}
+    .sidebar.open{transform:none;}
+    .content{padding:18px 16px 60px;}
+    .topbar{padding:14px 16px;position:relative;z-index:41;}
+    .menu-toggle{display:inline-flex;position:relative;z-index:41;}
+    .grid-3{grid-template-columns:1fr;}
+  }
+</style>
+
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* =====================================================================
+   SHARPE PRO PORTAL
+   A training + certification-tracking portal for Sharpe Pro Development.
+   Backend: Supabase (Postgres + Auth + Storage). See supabase_setup.sql
+   for the schema this app expects.
+   ===================================================================== */
+
+// ---------------------------------------------------------------------
+// 1. CONFIG — replace these two values with your own Supabase project's
+//    Project URL and "anon public" API key (Project Settings -> API).
+// ---------------------------------------------------------------------
+const SUPABASE_URL = "https://cqkqlnwaoatogeplzgnt.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_ugz8D5D0gi90AJXfDhbaUA_B5XD7yZc";
+
+const LOGO_DATA_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOIAAACOCAYAAAAsJtT2AAA3RUlEQVR4nO1dd3gV1fZdZ+ZebnLTeyOkEEIJvSpI81EtyFNRn4L6FLH351NUBERBUVFAFFRUFEWePizYQLEAgoLSgyAJCYT0fpPc5JaZ9ftjMjc3ISD6e5IEZn3f/iB35uzZZ+asOWXvs0eQhAEDBloWUksbYMCAAYOIBgy0ChhENGCgFcAgogEDrQAGEQ0YaAUwiGjAQCuAQUQDBloBDCIaMNAKYBDRgIFWAIOIBgy0AhhENGCgFcAgogEDrQAGEQ0YaAUwiGjAQCuAQUQDBloBDCIaMNAKYBDRgIFWAIOIBgy0AhhENGCgFcAgogEDrQAGEQ0YaAUwiGjAQCuAQUQDBloBDCIaMNAKYBDRgIFWAIOIBgy0AhhENGCgFcAgogEDrQAGEQ0YaAUwiGjAQCuAQUQDBloBTC1twNkIEhaSfkKgTghhb3yMVhI+zR07To/KQAImIUSNEHB4H1NVhgJAc8cMtD4I40Olpxckrd4Eo8pAIQlbs+ee5Njv6T3VYwZaB4yh6WmGEMK+7Olv+ez0r7n3x2IKSdj03gsqLC/O+ZoLHv6ah/ZUUkjCRpWB3uVJWACgtlq58rlHvuCimd+y+JhrsxDCriiMAYDs3yr4xL1rueL5bQQhCyHsJK2nvbIGThkGEU8jdMLFxkXhgafW4oFp78JVg8GSJMoUt5oICY7g0GDcP+8T/HvaO4AKS1MyCgEHSauvv7zaJFtw9+P/xfSbVw8BIcuyyAeAxNRgkXWoGNfftxKvzvvRDQBU4dcytTZwSiBpyGkURVFDSeK1p7exS8BsPjBlDZseWzRjM1Otszjz1s9IEqqqWqlSbk7f7Nu/ZIrlMS55/AeShOJWYkiCCi3XjFjO7sGz+dPX+fTWb0jrkxY34GwTVVWtJEGV8g3j32aPkDn8z7I9JAmX052mH5s88g32DH2CH725nyThdivx3no8pHIy9NKBL7NvxJP86es8koTD4R5IEr/ttHFQ+3m8oM+LdFZzcKNyhrQqaXEDzkbRyZCb6SoclvIsz0t8hkd/c5AkXE6lC0lkpds5JPEZjkh5jsU5XONdThe3W40hiV2bS9g/+kmO77mIrhr289azasluJppm8IEpH1Ivp6q0tPQ9MKSxtLgBZ6vopPrv8n3sbJ3Nfwx/jVQ0grhdajxJvP/KXnZqN5PXjXqD+tDU06PWi/738vnbmWSawbuv/ICNhrEq5Xuv/IDxYrqn59UJbEjrkRY3wBDikamfsKvfbC6Y/h3Jxj3fg9d/xFTfWVz82KbjjpGNe7fbLn2Pqb6z+M6Lu0gSLpeSQhLOag4e230hB8XNZcbuak2PW41o6Xob0iAtbsDZLB5SuWn9+6CXOSBmLjd/nkOyYWhJFwMnDniZA2LmcVP9sRPNF+sqedG4Xot4Tvt5PLCjkiThrNPmi1vW5bJP+BP8x/Dlnp5XVdTAlr4HhmhiuC9aEJIkylRFjYEM+8PzLoWqEvOmfwy3Hf1MZumA262mwATbQ09NhKKqmDf9YzirMFqWpRxvl4auxxKIT/89ZwKqq12YcedqQIXFbJG3KW418dwxsWLKTedh65YsPP2vDXUtWW8DzaCl3wRnvaiU9Xne0jlb2dlvFu+75r+eeZ4+hHx13jZ29pvFe656n3rZE80XF87YyI7tHuPMWz4n6dXzKrRcO/oNdvGbyW8+zKK3fkNaVlrcAEO85nkq5evHrmBnv1lc9dJukoTbpSTqx266YCU7+c7kykU764+p8Y31NLhGJp//OlP9ZvHjNzT3h9OppJFEzm8OntP+KQ5LeYbl+VxIGi6N1iAtboAhmug9U0Gm+7dhHZ/l0ORnefRALcmG+WJZHpeNTH2O58Y/xd92Nb/oov+dd9h15LzEpzki5VkWHVXXeetZvXQPO/vP4u2XrT7haqwhp1da3ABDGkSPiln79gH2Cp2juTTqiaL3jOvfz2CfyCd56aClDYsuTUikk/HjFfvZPXgOp3i5P/Te75Gpn7CTz0y+PGcrvcsY0jJiLNa0IghJKgOAiyZ3Fhf+vRd+/OEInp3+rVs7pgWHj768o7jsqv7Y+UseHr9zXf2ii1BAyLoeSRbFJK0Tru0q/n5FH3y/IRMLZ2zSYk5JPwCYveji7kkdQ7FkwVfY92M5JVkUqwojTnedDdSjpd8EhjQWz3zNxcBJg19h/6i53Lj2KEkvl4ZKefL5b7BX6BNc+/YBkicJgVNoueK8V9knfA43faa5P3SXxrYNBRwU+xQvGfAS1VomkoZLo6WkxQ0w5HjRI192/1DCXuFPcEy3F+is4UCygYwZe2o4KHYuhyY/w5JjXEWeOAQufVs5+0Y+ydFdn2dtJSeSDc7+Fx7dyGT5MT5286fUyxkhcKdfWtwAQ5oXnVRLHv+Bqb6zeP9kr10a9fO5dxfvYhf/WZx64dteiy6NSaTrWT5/Gzv5zOS9Vx0fAvePEcuZFvw4167UelfPDg5DTpu0uAGGNC/eLo1pF7/DtKA5fHfxLpKNY0Ufuv4jdrbO4qIZzYfAeZPunqs+YCe/WVy5cCdJwulw9yOJ3EPO6iEdnubQ5PksyHLvbVaPIX+ptLgBhpxY9J6vMMu9c3SXF3he8nxm7NHcFvoQVallysSBL7N/1DxuXZdL8sTzRXsFrxzfazHPaf8UM/faSRJ1ta7RpBZg3jfsSV4/5s0T9q6G/HXS4gYYcnLRe7+P39rPtODZnHL+6x6i6GTctiGf/aKe5MV9l9BtZxrZ3HxRI+fGtUeZFjiLV49YTrrZ4PZQKc++ZQMHRs/nK3N/JGn4Fk+nGMmjWjlIWATghoAyY9pn/M9b2zH17mF44OnzhaowAgKKJImyZU/8yOfmfIkL/94Dz6+6zAQBhYRFz+DG+lw3QsCx8JEfuOadXxATH4he/ToAAPJySpF3tBoSTCipLManP953m18oXqaReOq0wPAjtnIIAQdBCwDMeflCvx59Y7Hy1S345qNsSrIo1v2HNz9yjmnUBV3wxdp0vLN4lxtoyJHj0VMfKD54ZCrMZhlQZPz3vR+xauUP2LHjMFK6hKNnvzhUltbhuy8PvAQYuW5OG1q6Szbk1EQfov7yXSEHxc7jBT0X017Oa8iGqJvyAi74W5fneW78083uO9SHq0/d9w27+M/i1nVFVGuZeDi9ivYKXkkSh3bVsmO7GXxxVn0OHGPR5rSI0SO2EciyyFdVhvYdHiluvGMkDh4swcO3fLASAGSTlK241cTgKNz378cvRkV5Labf+i6gwiLJolhxq4mqwghJEmWH99Xyw/e2oVPncJwzOsIkfJCd1M1f+AZhNQAkpvr0jozyw74dRwFCliRRxvphrYG/DgYR2xCEQB0A3PTQINOI81Pw+dp0vPfynkaT/DGTOorrbx6KX37KweN3aSFwsknKlmRRnLm3jvf98y2UlFTjwTkTAQFFUdR4atnFLQBg8sXuxOQIZBwsAN3QhrakQcS/GEbK/TYEIYRdVRkqSaJs3rJr1l89euGYRfO+RJ9zkti5T4BQ3GqibJKy/z3/fJ99O3Pq1q9NR3RsKDumRmL9J7vw1Rf74HC58eTCSRgyPk6QsMiylKPrZ/3iTpe09ti5cyvysh1FcZ0sgoBJtGTFzwIYPWIbg7YbnxER8WLsrQ+MRlWlA0/+67+ACotskrLdLrULJDj+fs058Pe14u2lmzF50stY+/Eu9Ogdh7c/uRVX3tJTsJnM3/piTqdu0aipduLXXcfqDzQElBv4a2D0iG0QkiyKAeDSG9PE9h8y+fH7u/Ds9G/r/vX0SCFJqASAY1mlKKusxAOPXYLOvaIQHGZBh1SrCQKK3queSH9q92hIQsLB9EKMmtQREFBOV93OVhg9YhuF7pqY99oEn85pkXj7tS34ek0WJVnKryjAwjWrtyE80g+Tbu7i03NwiOjQ2SogoFBl4IlIqPscOySHbYyK8sP+PdqoVSe3gb8OBhHbKCRJlCkKYyDB8fDcifD1NWHxvHWoLMT8F+d+c1f6oQJcO20YIMHhcqlpisKY3/26lBAOAIhoL58fExuE7MwSwI1AQCjGyulfC4OIbRi6S2PA+dHiyikDUVZYizsmvfvAhs/24u67R+Gq23sKADCZpAxZFvm/94k37QM3sEBA6d0vCUeOliE/x/Ur0LCh2MBfA4OIbRxCiBoAuHfuSFP7jgEoLq5C127xeGT+qEig4aOop6LL+9yEpGjU2RVkHSiK1Q4aCzZ/JQwitnEIAYeqMhQCyrL/TJ1lsrqwd082rhr1etG61RkUAg5JEmWqylDvkLemUFWG6ueueH4HP3n/Z3RMisK+nfUrp8aCzV8Kg4hnAHSiBUZg9qc/3RF00eW9kHmoAPfdtAq3X7qaWftrKUmiTJ9X6h801aG41URJEmUg5Hn3fs0Fc76ApZ0FVqsPDu7L9VyjRSp3lsAg4hkCLRSNVphge/C5v4lPtvz76MgxXfDl5/sxYcizmH3bF7SX4wZZFvmyLPKpMpCERVUZKpukbGc1Rl4/boX7lRc3oUevODy3YkqRX4AJGYcKPcNSY8Hmr4NBxDMI2ie6NXLFJJkSXvxgkljx0TR0S4vBytd+xAUDn1u+bO6PhAKrkIRNH4ru/qGMEwYv/ibz11JMvKwHVm643ieuE6KCwtqhMM+G8kIsAmCEuv2FMIh4hkEnF0mrqjL0vHFxYvWmqabZCy5FO7MJC+d9hQmDXqr5eMWvBCH/Z9leXnfJEphpxbCR3fH8qstNkDR/YlqvDigpqcbhg4W3Ac33iCQsqsIIVWGEqjL0z/SaqspQXUdLlG8NMIh4hkIIYRdC1CiKGg8B5eo7eon/brx7+j+uHYDyEjvmTl+L2yeucb/54haMGNYHKZ2jsWljOrZ8me/WdSSlhqPOpSDnsDY9JOjjfQ0tJI6yJItiSRbF2jyS8h8hA0mrJIkyXccfLl8foKCX11wwx4fvtXYYRDwFNH2wbeVBCwGHLEs5+nA1IBxPzVgyTrz24c3o1TcO2346BIvJgrCoANx43/mIjQ3HPVPfxOF9tQSArr3bw9/PjIN78wEAkiRKAa3+JOuHt8JekF1b8vOmXB49VE3tBfD7ZKAnY4Cw19pw2S+bcpm5r6KhvNfXrpovr+kXkrDBjcAdm/OY/ksxQch6cPz/4BaeNhipMv4ASktLd4aFhfVpaTv+LLTGT1lPffHNmmy+9Mx6HNhfhAH9OyE4yB95ueUoqyrCV3vv84OAcl7y03VdusXhtc8mm7RtU4yRZZEPAJ+/d4AvL1gLSZYQGxuOvPxSyLLA0pV37ItMMPdQFUbocbHe8MS6EvJjt69xb/ouHV26xqOk2AZbdQ0WLJuGtAFhot6lUtc0VYd3hNDCWd/wg/c2omvXDqipcSAvtwSznp6M4RclCaoMhIC7TaT6aOmdya1Z9ORJu3bt4g033MApU6bwpptuYkZGBr2PtyVRVVrcbjXGOxP4mwt+4YiUZzmuy1LeesEnvLz/W5wy6nVSoeW2v7/P4SnPeL6zQRK5GXW1Fw6cz2tGv8j07SX01r/ho0z27fAov/0kk6SWyFhR1FBVpUVR1FA9sbHqYMzItMc549Y1jfKs7tlawv6JM/je0h0ktcwEbrcao6q0qCotenkqtEwa/gKnTVzeyLb8w84jQzrN5LMPfemxq2lWu9YoLW5AaxVvkt1555385z//yenTp3Py5MmcMWMGm57T1kRVVat3Gg17Ba+cectnHNx+PqcMW81xXV7m8w9t5Rvz9rFb0Gzay3gtSSyZ8y0HJc3gD+u0zwA06KNFvx8uO3udm/IY33zhJ3of1/+fl+ko6dv+Ya7/4BCbK0+FlrF95vLxuz9ptrxSx8TBHWfytfk/NCnfkAv22nEvc+qEV5st3xrFmCOeAnx9fREYGAi3243AwEBIknbbNHdB25gvNoUQwq59rAYWqgz0DcLqWS9fIF5dMw2KVIVahwMb1x/A9h8y0T4qDL/uqFxx35T3uOm7vfgx83HT4DHxwjtaRwg4hBB2RWGMyRe7txyc7fPf977HtL8vp6sGg4WAA4S88sXtvHDo7LA3378Poy9LEaqixpC06uVVlaGQ4Phyx3RxNKsQE4c8x/ICLtN3hmz4MJMDOj6SNefZKbjxgcFCWynVy9fPLQWUFV/cIuI6hGNYl1nM2m+jJ462leKMniNSW1TwA7SYTO+5wsmO6cf13x588EHW1tbCarWisrISMTExeOyxxwQAqKoaoeuo/9dDTl2/JEnHzZNOBSfS3Zxe/dwTXe9k9VVVNUI/JstyNgj5g9f2uV9d+DXs1W5IsgSnWoPb7h2HKXcNEIAWjSNkqUgAigDcBEwk/XTnv55h7vUFW9zvrPgW7WPDUVxSgY6dovH88uv6m6z45bh9kYRM0KKqaqQsy9kAsPad/Vz49BpERYWg0laDAH9fLFpx68aI9qbhJ9pXSa/UkV+vOcQVr36Gt7+4R+jHdFK3JpyRRNQb3R8hgN6Q9TKnQkRVVSNO5RqqqkY0R/b/7/l6PZt7yZzsxaL/rf//hNdxI9BhxzBVQahvAD6CCTa3W00xmaSM36uD26V2ERJqZFnKASHnZ9urI2OtPWQLMgBAUdR47zQdv1dn1iFRtEO+7uN0u5Q0k1lOP9m9UVWGeV+jNeOM26GvNzj9gaanp3P//v3Iy8uDzWaDqqqQJAl+fn6IjIxEp06d0Ldv30Fms3mbd/lTuZYkScUOh+OiLVu2rD106BBKS0vhdDohSRJCQ0ORmpqKIUOG3GW1Whefqm6SVp3cRUVFFdu2bQs6fPgwKioqoKoqAgIC0KVLFwwcODAvIiIiTteXnZ3NnJwcpKamuqOiosxN9Qoh7IcPH2ZeXh569+79hL+//wz9WFVV1YKsrKx7bTYbOnZMRkxMrJaiRkbNwX1la92Kgr5DInwAbUtVdRnu/ObTXxel78pFcaENzjo3rH7t0CE5DH3PTcLg0e19TGbpAADoK6cxSVZfQPc9CnfjXDkNdbbZbMu2b98+LSMjA8XFxairc8LXpx1i42KQkJCArl27IyYmWpjMcvrJ7qcQwi7L2lC3uZXX1oYzqkf0fjDvv/8+N2zYAJvNBrPZDIvFAllu2MmjKApcLhccDgcsFgv69++PqVOnXmyxWD7Ve4vmesTy8nJ07doV99xzj1i2bBl/+OEHqKoKi8UCk8kEk8kEVVXhcrlQV1cHIQRGjBiBG2+8UTS1sSn0HragoICvvfYafv31V8iy7NGt211bWwuS6Ny5Mx599FG/b7/9tua5555DWFgYbDYb7r//fgwdOlR49zIrVqzghx9+CD8/P7jdbixdunR9SEjI2GeeeYZ79uyBoiiQZRmlpWV48MF/YfjQkT4XDVxYV5TrhKoqSO0WgUUrbvxi8bzPx2/8+gAktoOvry8sFhMkIaAoKurqnKhx1CIoxIwrrjsXk+/oY9KzAujD66a7OPT7UVJS8tvy5cs77du3DySPu591dQ643S6oqoqkpCRcc8016Nq1q/gjL87WjDOGiPoDURQl8Z577skqKSlBTEyM52HWrxR6ztdJ6Xa7oSgKSkpKAABz585FXFxco2GnTkQfHx/Pgo3D4cDRo0cRHR0Ns9kMSZI81/D+v6qqyMvLQ0REBBYuXHhCMuq/ffXVV3z11VcRFBSE4OBgCCEgSRKEaMijJoSAy+VCWVkZzGYzzGYz2rXTiFFQUIC4uDjMnj3bUweS1uuuu64mIiICvr6+OHbsGIYOHYrCwkLs3r0bCQkJkCQJFosFubl56DOgOy4eejv+PuIZDOrfHU6nC/ZaJyorKyGEjMiIEFgsJkAIqIp2TyVZgqqqUNwqXE4FmVnH0KlHCF7/8PoOwoKc5rID6PZt2LCBr7zyCvz9/RESEgKTyXTc/fSud1VVFUpLS3HVVVfhsssuE01fnG0RZwQRvRv2v/71L1ZWViI8PBxutxatVV5eDrvdDkmSGhGlXbt2CAsLgxACJpMJ1dXVcDgceOWVVxplD9SJaLFoi26KokAIAbPZXP+2rkNZWZm2DC1JUBQFAQEBCAwMBEmYzWYUFRUhMjIS8+bNOy4zod4gv//+ey5evBjJycl6vUASFRUVHvsBwGw2IzQ0FBaLBS6XCyQ9RK2urkZ8fDwefvjhRkS88847aywWC4QQngZNEn5+fnA4HKiurgYAZGYexvRH/oVu7ccevXLsCx1SO3aAqmj6hQRIkka+8opqlJdXA0IFKSBLEsLDguHvbwEJtLOYkXusCNYw4L0NU30gadE2+nPSbVu/fj2XLVuGjh07QgjheXmVlJTA5XJBCOGpn7+/PwIDAz11yMzMxOTJkzFx4sRTnq+3VpwRc8T6BQv7unXreOTIEaSkpHgaWlFREfr164c+ffogNjYWVqsVtbW1KCoqwv79+7Fx40YEBwd7GmVpaSneffddXn311c2m8tTJJoSA2+1GXl4eIiMjcfnll6Nr164wmUw4duwYNm/ejP2/7kdMdAxcLhciIyORmZmJTz/9lBdddJGn4ej/lpSU/LZkyRIkJiZCfznW1taisrIS55xzDnr27InQ0FBUVlbi4MGD2Lx5M9xuN6Kiohp8UfUvGu+eX4eiKJ4GTdLT6+Tm5sJkMqFTp06wWNphzOix+NvIvwXt/qG0UgIA0VBvQYEqWx2O5edjwKAEXD26P5I6RcKtKMhIL8SXH+3E4axSJCXGwlHnQkxsOH77LQdz7vqibsaL4wUIE0QDCY8cOcJXXnkFycnJnjqXl5dDUVWMHTsW3bt3R1hYGGpra3HkyBH8+OOPSE9PR3R0NGRZRnJyMlasWIFevXoxKSmpTZPxjCCifvO3bNmC8PBwKIo2DSktLcV9992HPn36HEeqlJQUDB48GJdccknuAw88EBsWFgaTyYR27drhwIEDv3tNksjLy8NVV12FCRMmNNLfsWNHDB8+HF9++SXffvttxMbGwu12o3379vjss89w0UUXQe+p9LnTq6++2ikgIMDTW9vt2ihr0aJF60NCQsZ66x88eDD++c9/YunSpdy4cSPi4uI8Ddl7CHsyCCGQn5+PkSNH4oYbbjiukNutQAgJqB8wSZJARWU1nKjC6x/ehE59AhqVGXh+NK6+o5f81gs73G+8uAnJSfFwORV07BiHzz7ag3/cNJQpvfyFtnijPa8lS5YgIiLCY3NxcTGSk5MxY8aMZp/X3/72N/z8889ctGgRIiMjIYRAVFQUXn/9dcyZM+dPu4laA9q8Q997Gb6qqsozX6upqUFaWhr69OkjFEVJdLlcAxVFSVQUJVFV1QhVVSMURUmMiIiImzx5Mg4dOoSjR4/C4XDgyiuvPOk1hRAoKCjAnXfe6SFhvS/Oqi2ba/8fN26cGDFiBMrLyz3D3/LycuzevZsAoChKkhDCnpuby3379iE0NNQzL3I4HHj22WdvDAkJGavb660bAG655RZx0UUXoaSkxEPgU4EkSSgvL8eAAQM8JNRtVxQ1/vj6Ak6HG8LkwIcbb+/eqU+Ax5lP0kqVgXq6jmvv7SuuuWkwjuUUQJI0PoUGhWLV8h+051W/g2Pnzp08cuQIAgICQBLV1dVo3769h4Te91Ovt6qqEf379xc33HADCgoKAAABAQHIzMxEdnY2m7aHtoQ2T0Rv6G9WVVU9cz5Ac1KbzeZtsixny7KcLUlScb0UKYqSOGrUKDFnzhxMmTIFS5cuXZmWltZsJmxAa8SlpaU477zzcO655wq9wUiSVKy7Tep7Oz8AGDVqFJxOp4ck7dq1w+HDhxvp3L59OyRJ8gx5CwsLcckll8DX1/d1RVESdXt13fqiFABcffXVIiQkBE6n85R7Q5JwOBy44oorAACKoiTqtguIuuPuqySQX1SCO6ZfANkX6YpLTZGEqJQkUSaEsAtJ2PQM5AAw9d8DfAJDzXA6FYBAeFgwdm/XPmqjuy22bt0Kf39/zzUqKytx4403AgDcbneaZ5W14dl6/h4xYoSIiopCbW0tZFmGLMvYu3evXrc2mW2uzRPRO5IlOjoadXVaO/Lx8UFhYSGefvppfvvtt9y9ezczMzNZVla22eVyDdTL6hEcvXr1EqNHjxZBQUFTTvZWJQlFUXDJJZc0sqEZu2oAICkpSQQHB0NRFEiShHbt2iE3V88DIxUBwK+//gqr1erRbbVaMXr06Ku8z2kK3W5A6xVcLtcp9YqSJMHhcCA2NhbR0dHiRNdoRGkCqqogpkOQdkwWZc0lk5JkUaznWh07oTeKisshBGA2SygvrcXh/VWevY4ZGRnw9/eHJEmw2Wzo168fEhMT69M/mtI9LwYv8R56nnvuubDZbJ7V3oMHDza6720NZ8QcUV+sGTZsGLZu3YqwsDC43W4EBAQgKysLu3fv9ixSyLI8xMfH5yc/Pz8EBwcjLi4OCQkJ6Nev367f2+IkhEBdXR0iIyMRExMj6n9r9sF7k9Pf3x+VlZVo164dzGYzbDZtFV9vWOXl5Z4V2bq6OrRv3x4+Pj6rm+ppUmfPCqS+OnyqsNvtSE1NPU6PN9T6yaGANk0kAafDWX/xE6dWFIAbALr2joVz+Y+orwMUBSgurEZyWgCqqqrnl5eXIywsTHN5KIruA12Wn58/TfeZNge3243o6OiV+r3UfbhlZWX6text0bd4RhBRb9CDBg0SY8eO5bp165CQkACz2YywsDBERkZ6VlH1VUVVVVFUVIScnBxs2rQJK1eu7N29e3fefPPNK4OCgqbUO8PtTa4Dt9uN8PDwP2SfdyCB7jrwhj7E0nur0FBtT+tfsQqor/aGhIQAaHiJNXPmn7yA1lNGxQXV69dUCQhUVWqXqaioeEB3TaiqiuDgYGzfvh3ffPPNtFOZ5wohJlutVugjDbPZ7BkJtVWcEUT0xs033yySkpL40UcfIT8/H+3atYPJZIKPjw9MJpNnMcdkMnl2UrjdbpDEgQMHcM8990xesGBBZNOVSh1/xu/atEzTudzv/f2/hNfI4HfO/P/5l2W5SR1IKC5tNOt2Hd+D+/r6IiAg4JT1ezv7FUVBTU2bHJF6cEYRUQ+CHjNmjBgzZgyysrK4f/9+HDt2DCUlJbDZbKipqYHL5YLT5YLb5YLFYkFwcDAAIDIyEsXFxViwYMGYOXPmnDa7fXx8YLfboapqo6FrS853pPoe8Q/TsX7Ymp9TgfquUFMigOBwbXHG4mM5LlKotrYWFRUVf/glJIRARUWFZ+GpLQ5LgTOMiN7B3oC2UJKUlHTcedXV1XPsdvudhYWFQVu3bsVPP/2EkJAQuN1uhIaGIisrC/n5+dTngX81/P39UVVVBQCwWCzIz8/31OdUGtb/tAetH1qqauM5ohCAySQ3Oqc5sL5NHdpfCJMsQxISFFWBMAHhkRoRQ4KDbzaZTMtUVYUsy6iqqkK3bt1w4YUXorCw0BNBdDLoowySiIqKQnJysj5nb3MkBM4QIuqNtaam5qG33nprXlFREcaNG4dBgwYJl8s1UJblLO8tNv7+/jP8/f1nREZGokePHoiJieGaNWsQERHhecAFBQWIiYk56XX/V3Z36NABWVlZCAgIQLt27ZCfn49Dhw6xU6dOwntv3onKCyFOYah5qkbVL8RIXj2iACAkOOxaxI6qMLLZfYAqA2VZ5IOQN39zEKEhwVBVFW6XipBQH3TsFugDAL5W31fCwsKWOZ1OyLIMs9mMkpISJCcnCz287w+b3UZ7Qh1t3n3h/QDuuuuued999x3y8/Mxe/ZsZGVl0Ww2b1NVNVI/19tBrLsxUlNTG4WFkYTT6TwdtvsBQO/evT2RNHqo3TvvvANAc1N4O/G9nPp+Qgj7zz//zJycHFgsFqiq+j/rHb0bBgmEhwRj0dzPAEI2maUDDQ59WDShVSWDAOCzVb+5D6YXwt/fAiGA0rJK9OgdD0hwKG4lBQD69OmDiooKANrQ/ODBg1i9ejUBbZHK7Xan6U58PfhC950CwLFjx1hcXJyr35O2TELgDCCijsrKyrfr6uqQkJCA4OBgJCYm4t133wXQvF9KkqRifQ/imjVrPH48vSGHhYX95Tbrc8DevXuL0NBQz2pqYGAgMjMzsWrVKgLaqrDe0HTbJUkq3rVrF5csWeKx9X8ZwK96zQ6pEgEBvsjPseOBa9e4ocKif0tDT1Gh+WSlnCO/Orl47np0TIyvt0egtLwcl04ZoNfaDQCjR4+u1AMdVFVFfHw8Pv30U3z99deUJKnYZDKlewVeFOvBGACwYMECPvjgg7jttttiv/rqK3r7ktsq2jwR9QYaFBQ0JTU1FVVVVVBVFX5+fsjOzsaDDz7ITZs2saysbLN3uerq6jk///wzH374YerOZX3RIDo6GikpKX/5/NA7QmbChAkoLCz07L+Ljo7G559/jjlz5nDv3r202WzLnE7nyKKioootW7Zw3rx5fPrppxEaGupx5P8v54pSE/eFqhKx0eE4tLccF/ZdUvfq3J+Y/lM5K4sxx2XHwPwMd8nr83/hDROXIiI0ApIEyCYZhYWlGD66E3oODhckLLJJyiZpjYyMDJ4wYQLy8/NhNps9c7033ngD8+bNY3p6Ouvq6q4EtEibnJwcrlmzhjfffDPT09MRFxeH9u3be162bZ2MZ8QcUfe3XX755Zg+fTq6dOkCkggODkZ1dTVeeukl+Pr6DrFardQfenV1NaqrqxEaGurx25HE0aNHMXPmzOOuoe9w+P+gufJ6VMv48ePFd999x/z8fERHR8PtdiMmJgY5OTmYO3curFbrNJPJNM3hcMDhcMDf3x8dOnTw+ER1t8T/u1dssljT2H4gMjIUDocb/3njF7zz2o/wtZoebedjfrTa5oRQJSR0iK3fMiVQWVENu8uGJ16a2r9egUX/KjGgheelp6fz8OHDSEhIgNvtRmxsLDIzM/HEE0/A39//PavV+p7T6fQsZoWHh8Ns1hIQOBwO+Pr6Npjehoenbb5HBODZyZCWliZuuukm/Pbbb3A4tOcdEBCAhIQEhIWFeR6gEMIzfA0M1BJK19TUICMjA7feeiv69u0rvJMxORwOzwZc3en+R+B0Oj0+TFmWjyuvv8nnzn2yU0BAAHJzcz29W3BwMDp06ICQkBD4+/sjIiICSUlJCA8PR1VVVaN9e2azGSaT6bj5LUk/h8MBSZI8vc8J69BksUaHNtezobTUBrNZRkqn9khN6YCYyGiE+ocisUMsOqbEQjJJ9Ts7ylBSUYi3Pr2zUk8UpW8M9u69nnzySZGWlobDhw975unh4eFISEjw+HmtVitiYmIQHx/viUCqrKxESUkJ7r333kb3sK3ijCAi0PA2vPjii8Xjjz/uieksKCiAzWbzxHrqQcKqqsJms6GgoAC5ubkICgrCc889h3HjxunpF2r0h9u1a1ccPHgQpaWlyMrKQteuXQF4Eh6d8C2sl09LS0NGRgZKS0uRmZmJtLS0RuX1hinLpozFixeLgQMHIjc3tz5nS50n4ADQSF1YWIjs7GyYTCbMnz8/b9CgQUhPT0d5eTmysrLQo0ePRnZIklTcoUMHZGRkoLCwEKWlpced0xTeDUMIoLKyClPvHoGufSKx/9dMHD1SCFuVHVS1IbGqqKiy1SI3pwQHM7PQY0A41u28v39sR3MwVVibrrJ6k/HRRx8VN954I2pqapCXl4fS0lLU1tYCaIhKUhQFNpsNhYWFOHbsGGJiYrBs2bL19SvLJ30ObQFnxA59b3iHhf3yyy/cvXs3jhw5gsrKSjgcDrjdbs+SeUhICFJTU9G3b19069ZNSxOoKInNuQu++OILZmRkIDU1FWPHjv3d/DNNj59KeW/bc3JyuGHDBuzfv98ThCDLMqxWKxITEzFw4EAMGjTI0219/PHHPHLkCLp164ZRo0Z59AMNjf7DDz+sycvLw+DBg9G3b99m873oyZ52fF/E+294Dx2T2wMEMrNy8O5Xdx2KSRapP39XwE3rD2LPL9morKyDy6nAZJIRHOKL7n3jceGkPujSN7h+O1PzKQ+975FuIwB8//333LFjB3JyclBbWwu32+3pyYODg/XEWUhNTfVsl2rL+xB1nHFE1KNrTvRw3G53miRJRU2P/165puf+kTfwHzm/acPU4XK5BppMpn3ev5/I5lO53gmDveuJ8/O3hXxg6mqkJLcHCRzOzsULb/0DPQeHN4xZ64ex7jp0N1lwQE912GAbfE7lS8Mnu/f6lqimL8cT3ae2ijNiscYb3tE1zeXKNJlMjXJhej/Qkz1UXVe9/+4PhZ4JIeze5U9Gdt2Gpg1Nd7Xox3Q9Tet6Iv16mVOxQTPk+J8kPeGWS+0im6QsPVGvyRe7G19HI6AQOCWSeA/Pm9rW3PM61RdmW8IZR0RvnMrDOtU3qq7rz76B/2j5k53X3Evj9/R7lzklG5odKLH+WqL0RNmyteucGgFPZuP/55y2iDNmscbA/xaSJCBJwsNHLYPAaQm9PSthELEFoIep/ZXX0ELD/sTHOuvnfQ6HA7V1TrQzmWAyy7DX2uFwun6vtIE/iTN6aNpacTqGV392DqUPOXsPjJ/czldZeejwMS1Pa7AJPftFdvU+x8D/Dmd9j6gHgQPaiqEWUN34813ex72PeQVg/64zWVUZqgc879h+gK++9N9GWce0TGiNdVFlYHO6vT9rTcKiqmqESu03/fy331jLH77fzQa79WxrJ64fSStBi6qoMb7BeOeDb+//YuI1PTDput54/5t7Z8k+OKAoSiK9XuD6PThR7+vp/Zuk12gaxH6i+9bWHfWnDD0s6mwXzxd0tSBka9OPkHof1/5WIrzP9/7bW7x16ec8NWc5E+NGUf/teF2Nr3UiaWqnoqihuq6eXS7i/XfNJ0m4Xe6U36vfcbrcSszx12v42Kd+ftPrn+weneyeet/D8jL7siGD/kHvYy3dPv5qOet7RLdTTQMhS5Ioc9RxcEFeeXXToWNtrXuiJImy6irnPS6n2gvQhn6KGzG5OWXUd0Q01yvouspL7avKSmrWAkBcbDRiIsPqj0s2rSwCsw8X1evSfG/l5fY3dT306sVslbXzvXXnHCmhvUa5UtsRoQ1J27ePR2SE1tHIJjlDkkSZvdp9bUFeRUXT+tlrnDfov+XmlBKELMlSvn68psp5p3Y9OLIyCwlC9t7JciS7iI5aDtXtZn0vJklScU2V69ZjR0vZ9Jp1te6LJEmU2Wvc1+TmlHruIQCUFtum7fjpV1SWu+bq1/qTj7ftoKXfBC0l+nfVb7p+Bu+/8zkueGolYyKGMTpiKKPDz+Mv27TPSm/ZtIc9u07k4udW0wc9uXuH9vtlF97FsOAhjI8ZyYiQIfzPu1/R++2tv+2rK123dkm5gOFBgxkXNZy3TX2SSxd9yPMGTKZuy03XPcao8POYkjCWkaFD+O4K7fvv/Xtdyrmztc9POxzOoSTx9hufsXPHcSSJDet+ZkzkcHbsMIbR4UN5wehbPDpHDb2BT8ys/3S1SnnEkOsYGTqE7aOGMzZyGH/YuJckkZNdzNSkMdz4zV52Th7PDjEjGWgZwLtvfcqj67wBV3HGg0t4/pDrGRc1nP7oy7ff+JxUKXdNuYAdYkcyQOrH++961lOGJMaMuJExkcOZFHc+46KGc9M3u0kSm7/fxe6pF/PpJ95kQqx2/9pHDae9WplIEsnxo9kxbjxTEsZx8IArGuk8U6XFDWgp0Yk4a/oy+qIPZz281PPAX3z+P/RBL6oKrSWF9s990Ze3TZ3LovyqnSopjx91C3t3nUiqlEli25YD9EFPrv/8R5KEy+XuousKCxnC6/7xiEf3G6+spQ96cdKE+0kSN06ZwaT2o0iVskrKOdlltKIPszNL+PWXvzAq9Dx6252aPI7LXlzDGpvrBh/04JaN6Z7jY4beyL8N/SdJ4vzz/smn5rxBkkiIPZ+XXnS3x97/vLuBvujN0iL7GqqUfdCLfdMuZ8ZvBSSJshLHskDLQD5w9wKSxKDeVzEqdChLCmvWafX9jQHyAPbueik3fbeHJFFcaF/ni14NL5Gel3P8+dM8tn3z1Q76oQ+dtexVlF/zoy/6afe83qbrrnqYHWJGkiRysssYEjiYtkrXPS3dTk6XtLgBLSU6ER+4awH7dpvEpsfP7XcNZz+8lDVVypVW9PY0mLxjZS7vv3XSLXx2FVMTtZ7K5XKlkcT7721giP85x+m+4erHOGbEzSQJP/Rl/rHKEu/jT81ewf49LidJBJr6c9/ubJJEfm5loT/6kSSmXjuLd936TCPd9ip1oi960VHLfhMvuItLF/+XeTkVtQFSP895isJAkrj+6hm8YuJ91ImYcbBIs93p6kUS6XtyGIC+JIn+3Sdx0bPvkSScTlc/krj0gns4edJD2m8O10CSeOTfSzj58gfprGUv73uky9/H3cOH7n2BtnLXQ/71unVRXQz1Rz/thaTQGuQ70HP8bJgjnvXui8pKG/oP0HYiKG4lhYDJZJIPjBo9GEeO5EFV1UhLgK9nn97OHftNwRFBnr+FQB0AjDh/EJ588kUADXsM9+89hH59GnZakPSTZTl78LB+eO/dtVoKesmESyfcHlZSVkwIAbNZhs1mR+eURADAJZeOwpOPv4R3P3gaixasiBw0tBcAoKS4FDvXb8HmjVtZba8BCfj5WuET4Au3y91LCECWJOzZfdAnISWu3gaGUlVDIcm24SMHYvmrqwEAFl8LOnaKMAGAJEt5AJCc0n6YMMsba6s5UTZJCA0LanTfTGYZ8fGxABpSfvhYzJBNJthstfNUqBh6zrXuwqIiEAJ+vr7IPpKHc87rDYfTNdInyKeRPmFCmclqgltBLAiZzeyHPJNx1hPRarVix04tnFFIolKPHdn5Szr69E0DVfiBDY2iY6dE2IqrPX9r32lH9raf9iDA3+r5TZJQ3KlzEpa9ugpA/eKOovoAwL7dv0ESQiOzqmDV+y8gITlMlJfaV4WEWifX1mGY4nJ3B4DHZt+JwYOvAAj53VUf4o23ntVslQUmTboAzyy6W5QW16wLCfGbLMkoKy+te9MaYHrdZqteThCpnZORm1dUb4MoU1SEAsDuHb8iMjIcEFActXUozK86HBUbkKAoagdJkoqLC8o3qooKX3/xkdPpBET9Pah3Q1BV4XTV73sUWnZvFYTb7YbFx/yFCebx679dMd7XV3xVWVG3ICjY577KCtecoBDzwwf2HaPUNO9pPSSgTgX8JFnSrnWSjHFnFFq6S24p0Yem82a9QR/05ep3vvIMhbZtPUAf9KKt3PVQXk5FbUjgufQumxQ3itdf3TDvq7VzqD/68M1XPyXZeI7oh758fv67nnP378uhD3py0sXaHHH0sBu0IaKX/vioEXzxhYYyIwZfx/vueIHn9rva89vGb3YxwNyftXYO1X977MElTEu9kKS2WPPcvLdIEoHmAZz/5ApP2WNHK+iDXtyzM4tUKfuiN8eMmNbIhg6x5/OKiZqNqUnj+c6bX5BsGIZefvG9vP9ObXFGX0iaO3s5x424iSSRGHu+Z45KasPmYOsgHtifw6OHSxgePLjR9UgiyHcQXU4majb1pMPOgS3dTk6XtLgBLSU6Ee+46UlOu24O77rlKXaMH82+PS6nP/pyxXKNVJs37mawdVCjRlNbo47ulDCGCbHn87xBkxnsP4gzp7/kOcfbJ7Zn12EG+Q9iatJ4duk4nheNuZUP3bvYQxiqlAf2mcTE2JG8cPStjAwdwhumzCDZ4If74L0N9MMAvvbyxyQbiL7ouVUMDRrMMSNuZPfOF7ND7Ejm5pSRJPp0m8B779BWPg8dyGNs1DB26Tie5/a7isHWQVy+TNNVUlS9rlPCBXzjlc/ZMX40h/S/msHWQTxv4DWe+iTEjOTSxf8h2UDEEYOn8PprppMkHHXOkSTx73ueZd+0S0gSFWW1C5Pbj2LXlAs4dsRNDA0azDmPaau43379M8OavNyo0BJgHsDcY6UkiQtH38IQ/3M4ath1jc87Q6XFDWgp0Yk49dqZnHrdbJLEju0H+dWX26gq9HJsMzQ7q9DTGLwXDvbvy+aG9dtZZ1eHNncNlQ2LFZs37ubm73Z59BzLKab3OYd+zeXXX/7EsjL7a81dKzenlM1dw1HHXhvWb+PunRmNjhfklxXaKmtnev+2Y/tv3PjNL40WUSrKahd6XjQq5XWfbeXhjIJGunJzSmi3uyZ621RcVPljeWnVKu/fbJW1Mwvyy3O9y+7ekcFv1m+ns1bt13DvGXHU657qkn04v9FvR7OK+duBo83W+0yTM25j8KlCUdR4WZZybr9pLuvqHFj+9uzGXyI7yeZaNrMp9UTnn0zPH9X1e7o1XUJpGgvanD69/rZK1yMdE0c8UVz2g8l7Psb6AII/G1eqlaf8Z+r1R889E3DWL9bk5uahrk5ra06na6gsSzlatEtDlAibbETVNrHCon1dl7KAcHhHonhD3/CqJTkWiraiSpleG3u9dQFC0T/m6QFpUVRGavsAGxqntuGYoaQaCGirtTpxtPhNoegfE210npDK9M3NtXb7bTUVDfuctR3xks37Woqixje9thZFRNn7vnj/JgQcJKyee9TknmqLXI3rqShqvCyJIj3Tm/714uPuxxmIs5aIekOcdNV4uOu/UqQltT0+yVFzb2Yh4DjVBqIl3/VO9SDQmFC/o0sIhyyLZo9r9srHpaNouvviuPPqe2I/f5/np912xTN6byjLpoymvWBztmn6xEl/0+rd7Edcm/3d+zonOudMxVk7NDVgoDXhrA/61r/h0NJ2tCT+6k3KBn4fRo9owEArwFnfIxow0BpgENGAgVYAg4gGDLQCGEQ0YKAVwCCiAQOtAAYRDRhoBTCIaMBAK4BBRAMGWgEMIhow0ApgENGAgVYAg4gGDLQCGEQ0YKAVwCCiAQOtAAYRDRhoBTCIaMBAK4BBRAMGWgEMIhow0ApgENGAgVaA/wOZKgHUdww0fAAAAABJRU5ErkJggg==";
+
+const sb = (SUPABASE_URL.startsWith("http"))
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+// ---------------------------------------------------------------------
+// 2. STATIC PATHWAY DEFINITIONS
+// ---------------------------------------------------------------------
+const CE_TOPICS = [
+  { key: "ethics", label: "Ethics (may include HIPAA / confidentiality)", required: 3 },
+  { key: "boundaries", label: "Boundaries", required: 3 },
+  { key: "diversity", label: "Diversity & Inclusion / Cultural Sensitivity", required: 2 },
+  { key: "system_nav", label: "System Navigation & Care Coordination", required: 1 },
+  { key: "trauma", label: "Trauma-Informed Care", required: 2 },
+  { key: "trafficking", label: "Human Trafficking", required: 1 },
+  { key: "behavioral_health", label: "Behavioral Health Knowledge", required: 1 },
+  { key: "wellness", label: "Health & Wellness Principles", required: 1 },
+  { key: "coaching", label: "Principles of Coaching", required: 2 },
+  { key: "general", label: "General / Other relevant topic", required: 0 },
+];
+const CE_TOTAL_REQUIRED = 30;
+const RECERT_CYCLE_YEARS = 2;
+
+const OHIO_MILESTONES = [
+  { key: "background_check", label: "Complete BCI + FBI criminal background checks",
+    help: "Have both sent directly from the background check agency to: Ohio Department of Behavioral Health, ATTN: Peer Services, 30 East Broad Street, 36th Floor, Columbus, OH 43215. BCI code: “Other: Ohio Certified Peer Recovery Supporter.” FBI code: “Volunteer Children’s Act.” Must include “Peer Services” in the address or it won’t arrive." },
+  { key: "elicense_applied", label: "Apply for certification in eLicense",
+    help: "Create an account at elicense.ohio.gov and upload your completion certificates there." },
+  { key: "exam_passed", label: "Pass the online Peer Recovery Supporter Certification Exam",
+    help: "110 multiple-choice questions, 70% to pass, up to 3 attempts. Must be completed in one sitting, on a laptop or desktop." },
+  { key: "certified", label: "Receive Ohio Peer Recovery Supporter Certification",
+    help: "Arrives by email through eLicense, usually within 14 business days of passing the exam. This date starts the 2-year recertification clock — add it under Recertification once received." },
+];
+const CCAR_MILESTONES = [
+  { key: "application_submitted", label: "Submit CCAR application and fee",
+    help: "Two tracks: Interview + Application ($149) if training is already complete elsewhere, or Education + Application + Interview ($1,200) to complete training through CCAR." },
+  { key: "rcp_earned", label: "Receive the CCAR Recovery Coach Professional (RCP) designation",
+    help: "Awarded once all 60 hours of training are complete and the application is approved." },
+];
+const CCAR_TOTAL_HOURS = 60;
+
+// ---------------------------------------------------------------------
+// 3. STATE
+// ---------------------------------------------------------------------
+const state = {
+  session: null,
+  profile: null,
+  view: "dashboard",
+  adminTraineeId: null,
+  data: { classes: [], enrollments: [], milestones: [], recert: null, ceLogs: [] },
+  adminData: { trainees: [], allEnrollments: [], allMilestones: [], allRecert: [], allCeLogs: [] },
+  loading: true,
+};
+
+function fmtDate(d){
+  if(!d) return "—";
+  const dt = new Date(d + "T00:00:00");
+  return dt.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
+}
+function daysUntil(d){
+  const dt = new Date(d + "T00:00:00");
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((dt-now)/86400000);
+}
+function toast(msg, kind){
+  const wrap = document.getElementById("toastWrap");
+  const el = document.createElement("div");
+  el.className = "toast " + (kind === "err" ? "err" : "ok");
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 4200);
+}
+function costLabel(cost){
+  if (cost === 0) return "Free";
+  if (cost === null || cost === undefined || cost === "") return "Varies";
+  return "$" + cost;
+}
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+// ---------------------------------------------------------------------
+// 4. DATA LAYER (Supabase)
+// ---------------------------------------------------------------------
+async function loadTraineeData(userId){
+  const [classesRes, enrollRes, milestoneRes, recertRes, ceRes] = await Promise.all([
+    sb.from("classes").select("*").order("sort_order"),
+    sb.from("enrollments").select("*").eq("user_id", userId),
+    sb.from("certification_milestones").select("*").eq("user_id", userId),
+    sb.from("recert_cycles").select("*").eq("user_id", userId).maybeSingle(),
+    sb.from("ce_logs").select("*").eq("user_id", userId).order("date_completed", { ascending:false }),
+  ]);
+  state.data.classes = classesRes.data || [];
+  state.data.enrollments = enrollRes.data || [];
+  state.data.milestones = milestoneRes.data || [];
+  state.data.recert = recertRes.data || null;
+  state.data.ceLogs = ceRes.data || [];
+}
+
+async function loadAdminData(){
+  const [profilesRes, classesRes, enrollRes, milestoneRes, recertRes, ceRes] = await Promise.all([
+    sb.from("profiles").select("*").order("created_at"),
+    sb.from("classes").select("*").order("sort_order"),
+    sb.from("enrollments").select("*"),
+    sb.from("certification_milestones").select("*"),
+    sb.from("recert_cycles").select("*"),
+    sb.from("ce_logs").select("*"),
+  ]);
+  state.adminData.trainees = (profilesRes.data || []).filter(p => p.role !== "admin");
+  state.adminData.allStaff = (profilesRes.data || []).filter(p => p.role === "admin");
+  state.data.classes = classesRes.data || [];
+  state.adminData.allEnrollments = enrollRes.data || [];
+  state.adminData.allMilestones = milestoneRes.data || [];
+  state.adminData.allRecert = recertRes.data || [];
+  state.adminData.allCeLogs = ceRes.data || [];
+}
+
+async function refreshAll(){
+  if (!state.session) return;
+  if (state.profile.role === "admin") await loadAdminData();
+  else await loadTraineeData(state.profile.id);
+}
+
+async function uploadCertificateFile(file, forUserId){
+  const path = `${forUserId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_.-]/g,"_")}`;
+  const { error } = await sb.storage.from("certificates").upload(path, file, { upsert:false });
+  if (error) throw error;
+  return path;
+}
+async function signedUrlFor(path){
+  const { data, error } = await sb.storage.from("certificates").createSignedUrl(path, 300);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+// ---------------------------------------------------------------------
+// 5. RENDER SHELL
+// ---------------------------------------------------------------------
+const root = document.getElementById("app");
+
+function render(){
+  if (!sb){
+    root.innerHTML = renderConfigMissing();
+    return;
+  }
+  if (state.loading){
+    root.innerHTML = `<div class="center-screen"><div class="muted">Loading Sharpe Pro Portal…</div></div>`;
+    return;
+  }
+  if (!state.session){
+    root.innerHTML = renderAuth();
+    wireAuth();
+    return;
+  }
+  root.innerHTML = renderShell();
+  wireShell();
+  wireView();
+}
+
+function renderConfigMissing(){
+  return `<div class="center-screen"><div class="auth-card" style="max-width:520px;">
+    <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development"></div>
+    <h1 style="font-size:20px;">Almost ready</h1>
+    <p>This portal needs to be connected to its Supabase project before anyone can sign in. Add your Project URL and anon key at the top of the file, then republish.</p>
+  </div></div>`;
+}
+
+// ---------- AUTH SCREEN ----------
+function renderAuth(){
+  return `
+  <div class="center-screen">
+    <div class="auth-card">
+      <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development"></div>
+      <div class="tab-row">
+        <button class="tab-btn ${state._authTab!=='signup'?'active':''}" data-authtab="login">Log in</button>
+        <button class="tab-btn ${state._authTab==='signup'?'active':''}" data-authtab="signup">Create account</button>
+      </div>
+      ${state._authTab === "signup" ? renderSignupForm() : renderLoginForm()}
+      <div id="authMsg" class="hint" style="color:var(--critical);min-height:16px;"></div>
+    </div>
+  </div>`;
+}
+function renderLoginForm(){
+  return `
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" required autocomplete="email"></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" required autocomplete="current-password"></div>
+      <button class="btn btn-primary btn-block" type="submit">Log in</button>
+    </form>`;
+}
+function renderSignupForm(){
+  return `
+    <form id="signupForm">
+      <div class="field"><label>Full name</label><input type="text" id="suName" required autocomplete="name"></div>
+      <div class="field"><label>Email</label><input type="email" id="suEmail" required autocomplete="email"></div>
+      <div class="field"><label>Password</label><input type="password" id="suPassword" required minlength="6" autocomplete="new-password">
+        <div class="hint">At least 6 characters.</div></div>
+      <button class="btn btn-primary btn-block" type="submit">Create my account</button>
+    </form>`;
+}
+function wireAuth(){
+  document.querySelectorAll("[data-authtab]").forEach(b=>{
+    b.onclick = ()=>{ state._authTab = b.dataset.authtab; render(); };
+  });
+  const lf = document.getElementById("loginForm");
+  if (lf) lf.onsubmit = async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) document.getElementById("authMsg").textContent = error.message;
+  };
+  const sf = document.getElementById("signupForm");
+  if (sf) sf.onsubmit = async (e)=>{
+    e.preventDefault();
+    const full_name = document.getElementById("suName").value.trim();
+    const email = document.getElementById("suEmail").value.trim();
+    const password = document.getElementById("suPassword").value;
+    const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name } } });
+    if (error) { document.getElementById("authMsg").textContent = error.message; return; }
+    toast("Account created. You're in.");
+  };
+}
+
+// ---------- APP SHELL ----------
+function traineeNav(){
+  return [
+    { id:"dashboard", label:"Dashboard", ic:"⌂" },
+    { id:"ohio", label:"Ohio Pathway", ic:"✓" },
+    { id:"ccar", label:"CCAR Pathway", ic:"✓" },
+    { id:"classes", label:"Class Catalog", ic:"☷" },
+    { id:"certificates", label:"My Certificates", ic:"⌘" },
+    { id:"recert", label:"Recertification", ic:"↻" },
+  ];
+}
+function adminNav(){
+  return [
+    { id:"admin_dashboard", label:"Overview", ic:"⌂" },
+    { id:"admin_trainees", label:"Trainees", ic:"▤" },
+    { id:"admin_classes", label:"Manage Classes", ic:"☷" },
+  ];
+}
+function renderShell(){
+  const isAdmin = state.profile.role === "admin";
+  const nav = isAdmin ? adminNav() : traineeNav();
+  return `
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development" style="height:44px;"></div>
+      <span class="pill pill-brand" style="margin:0 6px 4px;width:fit-content;">${isAdmin?"Staff / Admin":"Trainee"}</span>
+      <nav class="navlist">
+        ${nav.map(n=>`<button class="navlink ${state.view===n.id?'active':''}" data-nav="${n.id}"><span class="ic">${n.ic}</span>${n.label}</button>`).join("")}
+      </nav>
+      <div class="sidebar-foot">
+        <div class="who">
+          <div class="name">${escapeHtml(state.profile.full_name || "")}</div>
+          <div class="email">${escapeHtml(state.profile.email || "")}</div>
+        </div>
+        <button class="navlink" id="logoutBtn"><span class="ic">←</span>Log out</button>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="main">
+      <div class="topbar">
+        <button class="btn btn-secondary btn-sm menu-toggle" id="menuToggle">☰ Menu</button>
+        <div></div>
+      </div>
+      <div class="content" id="content">${renderView()}</div>
+    </div>
+  </div>`;
+}
+function closeSidebar(){
+  document.getElementById("sidebar")?.classList.remove("open");
+  document.getElementById("sidebarBackdrop")?.classList.remove("show");
+}
+function openSidebar(){
+  document.getElementById("sidebar")?.classList.add("open");
+  document.getElementById("sidebarBackdrop")?.classList.add("show");
+}
+function wireShell(){
+  document.querySelectorAll("[data-nav]").forEach(b=>{
+    b.onclick = ()=>{ state.view = b.dataset.nav; state.adminTraineeId = null; closeSidebar(); renderContent(); };
+  });
+  document.getElementById("logoutBtn").onclick = async ()=>{ await sb.auth.signOut(); };
+  const mt = document.getElementById("menuToggle");
+  if (mt) mt.onclick = ()=>{
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+  };
+  const backdrop = document.getElementById("sidebarBackdrop");
+  if (backdrop) backdrop.onclick = closeSidebar;
+}
+function renderContent(){
+  document.getElementById("content").innerHTML = renderView();
+  wireView();
+  document.querySelectorAll("[data-nav]").forEach(b=>{
+    b.classList.toggle("active", b.dataset.nav === state.view);
+  });
+}
+function renderView(){
+  const isAdmin = state.profile.role === "admin";
+  if (isAdmin){
+    if (state.view === "admin_classes") return renderAdminClasses();
+    if (state.view === "admin_trainees") return state.adminTraineeId ? renderAdminTraineeDetail() : renderAdminTrainees();
+    return renderAdminDashboard();
+  }
+  if (state.view === "ohio") return renderPathway("ohio");
+  if (state.view === "ccar") return renderPathway("ccar");
+  if (state.view === "classes") return renderClasses();
+  if (state.view === "certificates") return renderCertificates();
+  if (state.view === "recert") return renderRecert();
+  return renderTraineeDashboard();
+}
+function wireView(){
+  const isAdmin = state.profile.role === "admin";
+  if (isAdmin){
+    if (state.view === "admin_classes") return wireAdminClasses();
+    if (state.view === "admin_trainees") return state.adminTraineeId ? wireAdminTraineeDetail() : wireAdminTrainees();
+    return wireCommonStepActions(); // admin dashboard's "View all" link
+  }
+  if (state.view === "ohio") return wirePathway("ohio");
+  if (state.view === "ccar") return wirePathway("ccar");
+  if (state.view === "classes") return wireClasses();
+  if (state.view === "certificates") return wireCertificates();
+  if (state.view === "recert") return wireRecert();
+  wireCommonStepActions(); // trainee dashboard's "View checklist" links + mini checklist (no inputs there, safe no-op)
+}
+
+// ---------------------------------------------------------------------
+// 6. TRAINEE: helpers for progress
+// ---------------------------------------------------------------------
+function enrollmentFor(classId){
+  return state.data.enrollments.find(e=>e.class_id===classId);
+}
+function milestoneFor(pathway, key){
+  return state.data.milestones.find(m=>m.pathway===pathway && m.milestone_key===key);
+}
+function ohioProgress(){
+  const learn = state.data.classes.find(c=>c.pathway==="ohio" && c.category==="prerequisite");
+  const prs = state.data.classes.find(c=>c.pathway==="ohio" && c.category==="live_training");
+  const ccarAlt = state.data.classes.filter(c=>c.pathway==="ccar" && c.category==="core");
+  const steps = [];
+  if (learn) steps.push({ type:"class", cls: learn, done: enrollmentFor(learn.id)?.status === "completed" });
+  steps.push({ type:"milestone", def: OHIO_MILESTONES[0], done: !!milestoneFor("ohio","background_check")?.completed });
+  const prsDone = (prs && enrollmentFor(prs.id)?.status === "completed") ||
+    ccarAlt.every(c => enrollmentFor(c.id)?.status === "completed");
+  steps.push({ type:"class", cls: prs, done: prsDone, note: prs ? null : "40-hour training" });
+  OHIO_MILESTONES.slice(1).forEach(def=>{
+    steps.push({ type:"milestone", def, done: !!milestoneFor("ohio", def.key)?.completed });
+  });
+  const done = steps.filter(s=>s.done).length;
+  return { steps, done, total: steps.length, pct: Math.round(100*done/steps.length) };
+}
+function ccarProgress(){
+  const ccarClasses = state.data.classes.filter(c=>c.pathway==="ccar");
+  const hoursDone = ccarClasses.reduce((sum,c)=> sum + (enrollmentFor(c.id)?.status==="completed" ? Number(c.hours):0), 0);
+  const pct = Math.min(100, Math.round(100*hoursDone/CCAR_TOTAL_HOURS));
+  const rcpDone = !!milestoneFor("ccar","rcp_earned")?.completed;
+  return { hoursDone, total: CCAR_TOTAL_HOURS, pct, rcpDone, classes: ccarClasses };
+}
+function ceProgress(){
+  const totalsByTopic = {};
+  CE_TOPICS.forEach(t=>totalsByTopic[t.key]=0);
+  let totalHours = 0;
+  state.data.ceLogs.forEach(l=>{
+    totalsByTopic[l.topic_area] = (totalsByTopic[l.topic_area]||0) + Number(l.hours);
+    totalHours += Number(l.hours);
+  });
+  return { totalsByTopic, totalHours };
+}
+
+// ---------------------------------------------------------------------
+// 7. TRAINEE DASHBOARD
+// ---------------------------------------------------------------------
+function renderTraineeDashboard(){
+  const oh = ohioProgress();
+  const cc = ccarProgress();
+  const recert = state.data.recert;
+  let recertCard;
+  if (recert){
+    const days = daysUntil(recert.cycle_end_date);
+    const tone = days < 0 ? "critical" : days < 90 ? "warning" : "success";
+    recertCard = `<div class="stat-card card">
+      <div class="stat-label">Recertification</div>
+      <div class="stat-value" style="font-size:20px;">${fmtDate(recert.cycle_end_date)}</div>
+      <div class="stat-sub"><span class="pill pill-${tone}">${days<0?`${Math.abs(days)} days overdue`:`${days} days left`}</span></div>
+    </div>`;
+  } else {
+    recertCard = `<div class="stat-card card">
+      <div class="stat-label">Recertification</div>
+      <div class="stat-value" style="font-size:16px;color:var(--ink-faint);">Not started</div>
+      <div class="stat-sub">Add your certification date once you're certified.</div>
+    </div>`;
+  }
+  return `
+    <div class="page-head"><div><div class="eyebrow">Welcome back</div><h1>${escapeHtml((state.profile.full_name||"").split(" ")[0] || "there")}'s Dashboard</h1></div></div>
+    <div class="grid grid-3 section">
+      <div class="stat-card card">
+        <div class="stat-label">Ohio Pathway</div>
+        <div class="stat-value">${oh.done}/${oh.total}</div>
+        <div class="progress" style="margin-top:10px;"><span style="width:${oh.pct}%;"></span></div>
+      </div>
+      <div class="stat-card card">
+        <div class="stat-label">CCAR Pathway</div>
+        <div class="stat-value">${cc.hoursDone}<span style="font-size:16px;color:var(--ink-faint);">/${cc.total} hrs</span></div>
+        <div class="progress" style="margin-top:10px;"><span style="width:${cc.pct}%;"></span></div>
+      </div>
+      ${recertCard}
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Ohio Pathway</h2><button class="btn btn-secondary btn-sm" data-nav2="ohio">View checklist</button></div>
+      <div class="card">${renderMiniChecklist(oh.steps)}</div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>CCAR Pathway</h2><button class="btn btn-secondary btn-sm" data-nav2="ccar">View checklist</button></div>
+      <div class="card">
+        <p style="margin-bottom:10px;">${cc.hoursDone} of ${cc.total} training hours completed toward the RCP designation.</p>
+        <div class="progress"><span style="width:${cc.pct}%;"></span></div>
+      </div>
+    </div>
+  `;
+}
+function renderMiniChecklist(steps){
+  return `<div class="checklist">${steps.map(s=>{
+    const label = s.type==="class" ? (s.cls ? s.cls.name : s.note || "Training") : s.def.label;
+    return `<div class="check-row ${s.done?'done':''}" style="padding:10px 14px;">
+      <span class="check-badge" style="width:20px;height:20px;">${s.done?"✓":""}</span>
+      <div class="check-body"><div class="check-title" style="font-size:13.5px;">${escapeHtml(label)}</div></div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+// ---------------------------------------------------------------------
+// 8. PATHWAY CHECKLIST PAGES
+// ---------------------------------------------------------------------
+function renderPathway(pathway){
+  if (pathway === "ohio"){
+    const oh = ohioProgress();
+    return `
+      <div class="page-head"><div><div class="eyebrow">Certification pathway</div><h1>Ohio Peer Recovery Supporter</h1>
+        <p style="margin-top:6px;max-width:640px;">To be eligible, you must have direct lived experience and self-identify as being in recovery from a mental health or substance use disorder.</p></div></div>
+      <div class="card section" style="padding:16px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong>${oh.done} of ${oh.total} steps complete</strong><span class="muted">${oh.pct}%</span>
+        </div>
+        <div class="progress"><span style="width:${oh.pct}%;"></span></div>
+      </div>
+      <div class="checklist">${oh.steps.map((s,i)=>renderStepRow("ohio", s, i)).join("")}</div>
+    `;
+  }
+  const cc = ccarProgress();
+  return `
+    <div class="page-head"><div><div class="eyebrow">Certification pathway</div><h1>CCAR Recovery Coach (RCP)</h1>
+      <p style="margin-top:6px;max-width:640px;">60 total training hours earn the CCAR Recovery Coach Professional designation: 46 core hours plus 14 elective CE hours.</p></div></div>
+    <div class="card section" style="padding:16px 20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong>${cc.hoursDone} of ${cc.total} hours complete</strong><span class="muted">${cc.pct}%</span>
+      </div>
+      <div class="progress"><span style="width:${cc.pct}%;"></span></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Training</h2></div>
+      <div class="checklist">${cc.classes.map(c=>renderClassStepRow(c)).join("")}</div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Application</h2></div>
+      <div class="checklist">
+        ${CCAR_MILESTONES.map(def=>renderMilestoneRow("ccar", def, !!milestoneFor("ccar",def.key)?.completed)).join("")}
+      </div>
+    </div>
+  `;
+}
+function renderStepRow(pathway, s, i){
+  if (s.type === "class"){
+    return s.cls ? renderClassStepRow(s.cls) :
+      `<div class="check-row"><span class="check-badge"></span><div class="check-body"><div class="check-title">${escapeHtml(s.note||"Training")}</div><div class="check-meta">Add this class in the catalog first.</div></div></div>`;
+  }
+  return renderMilestoneRow(pathway, s.def, s.done);
+}
+function renderClassStepRow(cls){
+  const en = enrollmentFor(cls.id);
+  const done = en?.status === "completed";
+  return `<div class="check-row ${done?'done':''}">
+    <span class="check-badge">${done?"✓":""}</span>
+    <div class="check-body">
+      <div class="check-title">${escapeHtml(cls.name)}</div>
+      <div class="check-meta">${cls.hours} hrs · ${costLabel(cls.cost)} · ${escapeHtml(cls.format||"")}</div>
+      <div class="check-actions">
+        ${done
+          ? `<a href="#" data-view-cert="${en.certificate_path||''}" class="btn btn-secondary btn-sm">${en.certificate_path? "View certificate":"No certificate on file"}</a>
+             <button class="btn btn-ghost btn-sm" data-recert-start="${en.completed_date||''}" data-classid="${cls.id}">${cls.pathway==='ohio'?'':''}</button>`
+          : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">Mark complete + upload certificate
+              <input type="file" accept=".pdf,.png,.jpg,.jpeg" style="display:none;" data-upload-class="${cls.id}"></label>`}
+      </div>
+    </div>
+  </div>`;
+}
+function renderMilestoneRow(pathway, def, done){
+  return `<div class="check-row ${done?'done':''}">
+    <span class="check-badge">${done?"✓":""}</span>
+    <div class="check-body">
+      <div class="check-title">${escapeHtml(def.label)}</div>
+      ${def.help?`<div class="check-meta">${escapeHtml(def.help)}</div>`:""}
+      <div class="check-actions">
+        <button class="btn ${done?'btn-ghost':'btn-secondary'} btn-sm" data-toggle-milestone="${pathway}:${def.key}">${done? "Mark not done":"Mark done"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function wirePathway(pathway){
+  wireCommonStepActions();
+}
+function wireCommonStepActions(){
+  document.querySelectorAll("[data-upload-class]").forEach(el=>{
+    el.onchange = async (e)=>{
+      const file = e.target.files[0]; if (!file) return;
+      const classId = el.dataset.uploadClass;
+      try{
+        const path = await uploadCertificateFile(file, state.profile.id);
+        const existing = enrollmentFor(classId);
+        const payload = { user_id: state.profile.id, class_id: classId, status:"completed",
+          completed_date: new Date().toISOString().slice(0,10), certificate_path: path };
+        if (existing){
+          await sb.from("enrollments").update(payload).eq("id", existing.id);
+        } else {
+          await sb.from("enrollments").insert(payload);
+        }
+        await loadTraineeData(state.profile.id);
+        toast("Certificate uploaded and class marked complete.");
+        renderContent();
+      }catch(err){ toast(err.message || "Upload failed", "err"); }
+    };
+  });
+  document.querySelectorAll("[data-view-cert]").forEach(el=>{
+    el.onclick = async (e)=>{
+      e.preventDefault();
+      const path = el.dataset.viewCert;
+      if (!path){ toast("No certificate uploaded for this class yet.","err"); return; }
+      try{ const url = await signedUrlFor(path); window.open(url, "_blank"); }
+      catch(err){ toast(err.message||"Couldn't open file","err"); }
+    };
+  });
+  document.querySelectorAll("[data-toggle-milestone]").forEach(el=>{
+    el.onclick = async ()=>{
+      const [pathway, key] = el.dataset.toggleMilestone.split(":");
+      const existing = milestoneFor(pathway, key);
+      const completed = !(existing?.completed);
+      const payload = { user_id: state.profile.id, pathway, milestone_key:key, completed,
+        completed_date: completed ? new Date().toISOString().slice(0,10) : null };
+      await sb.from("certification_milestones").upsert(payload, { onConflict:"user_id,pathway,milestone_key" });
+      await loadTraineeData(state.profile.id);
+      toast(completed?"Marked complete.":"Marked not done.");
+      renderContent();
+    };
+  });
+  document.querySelectorAll("[data-nav2]").forEach(el=>{
+    el.onclick = ()=>{ state.view = el.dataset.nav2; renderContent(); };
+  });
+}
+
+// ---------------------------------------------------------------------
+// 9. CLASS CATALOG
+// ---------------------------------------------------------------------
+function renderClasses(){
+  const groups = [
+    ["ohio", "Ohio Pathway"],
+    ["ccar", "CCAR Pathway"],
+  ];
+  return `
+    <div class="page-head"><div><div class="eyebrow">Sharpe Pro Development</div><h1>Class Catalog</h1></div></div>
+    ${groups.map(([key,label])=>{
+      const list = state.data.classes.filter(c=>c.pathway===key);
+      if (!list.length) return "";
+      return `<div class="section"><div class="section-title"><h2>${label}</h2></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Class</th><th>Hours</th><th>Cost</th><th>Format</th><th>Status</th><th></th></tr></thead>
+          <tbody>${list.map(c=>{
+            const en = enrollmentFor(c.id);
+            const status = en?.status === "completed" ? `<span class="pill pill-success">Completed</span>` :
+              en?.status === "enrolled" ? `<span class="pill pill-brand">Enrolled</span>` :
+              `<span class="pill pill-neutral">Not started</span>`;
+            return `<tr>
+              <td><strong>${escapeHtml(c.name)}</strong><div class="muted" style="max-width:360px;">${escapeHtml(c.description||"")}</div></td>
+              <td class="num">${c.hours}</td>
+              <td class="num">${costLabel(c.cost)}</td>
+              <td>${escapeHtml(c.format||"—")}</td>
+              <td>${status}</td>
+              <td>${en?.status==="completed"
+                  ? `<a href="#" data-view-cert="${en.certificate_path||''}" class="btn btn-ghost btn-sm">Certificate</a>`
+                  : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">Upload cert
+                      <input type="file" accept=".pdf,.png,.jpg,.jpeg" style="display:none;" data-upload-class="${c.id}"></label>`}</td>
+            </tr>`;
+          }).join("")}</tbody>
+        </table></div>
+      </div>`;
+    }).join("")}
+  `;
+}
+function wireClasses(){ wireCommonStepActions(); }
+
+// ---------------------------------------------------------------------
+// 10. MY CERTIFICATES
+// ---------------------------------------------------------------------
+function renderCertificates(){
+  const classCerts = state.data.enrollments.filter(e=>e.certificate_path).map(e=>{
+    const cls = state.data.classes.find(c=>c.id===e.class_id);
+    return { title: cls?cls.name:"Class", date: e.completed_date, path: e.certificate_path, kind:"Class certificate" };
+  });
+  const ceCerts = state.data.ceLogs.filter(l=>l.certificate_path).map(l=>({
+    title: l.title, date: l.date_completed, path: l.certificate_path, kind:"CE certificate"
+  }));
+  const all = [...classCerts, ...ceCerts].sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+  return `
+    <div class="page-head"><div><div class="eyebrow">Records</div><h1>My Certificates</h1></div></div>
+    ${all.length ? `<div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Type</th><th>Date</th><th></th></tr></thead>
+      <tbody>${all.map(c=>`<tr>
+        <td><strong>${escapeHtml(c.title)}</strong></td>
+        <td><span class="pill pill-neutral">${c.kind}</span></td>
+        <td class="num">${fmtDate(c.date)}</td>
+        <td><a href="#" data-view-cert="${c.path}" class="btn btn-secondary btn-sm">Download</a></td>
+      </tr>`).join("")}</tbody>
+    </table></div>` : `<div class="card empty">No certificates uploaded yet. Upload one from the Class Catalog or Recertification page.</div>`}
+  `;
+}
+function wireCertificates(){ wireCommonStepActions(); }
+
+// ---------------------------------------------------------------------
+// 11. RECERTIFICATION
+// ---------------------------------------------------------------------
+function renderRecert(){
+  const recert = state.data.recert;
+  const ce = ceProgress();
+  const pct = Math.min(100, Math.round(100*ce.totalHours/CE_TOTAL_REQUIRED));
+  return `
+    <div class="page-head"><div><div class="eyebrow">Every 2 years</div><h1>Recertification</h1>
+      <p style="margin-top:6px;max-width:640px;">Ohio Peer Supporter certification is valid for 2 years and requires 30 hours of continuing education, including minimums in 9 topic areas. Submit your renewal within 90 days of expiration.</p></div>
+    </div>
+    <div class="card section">
+      <h3>Certification date</h3>
+      ${recert ? `
+        <p>Certified <strong>${fmtDate(recert.cert_date)}</strong> · expires <strong>${fmtDate(recert.cycle_end_date)}</strong></p>
+        <button class="btn btn-secondary btn-sm" id="editCertDate">Update date</button>
+      ` : `
+        <p class="muted">Add the date on your Ohio certificate to start tracking your recertification clock.</p>
+        <button class="btn btn-primary btn-sm" id="editCertDate">Add certification date</button>
+      `}
+    </div>
+    <div class="card section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3>Continuing education hours</h3><span class="muted num">${ce.totalHours} / ${CE_TOTAL_REQUIRED} hrs</span>
+      </div>
+      <div class="progress ${pct>=100?'success':''}" style="margin-bottom:16px;"><span style="width:${pct}%;"></span></div>
+      <div class="grid grid-2">
+        ${CE_TOPICS.filter(t=>t.required>0).map(t=>{
+          const have = ce.totalsByTopic[t.key]||0;
+          const ok = have >= t.required;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:13.5px;">${escapeHtml(t.label)}</span>
+            <span class="pill ${ok?'pill-success':'pill-neutral'} num">${have}/${t.required} hrs</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Training log</h2><button class="btn btn-primary btn-sm" id="addCeBtn">+ Add training</button></div>
+      ${state.data.ceLogs.length ? `<div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Provider</th><th>Topic</th><th>Date</th><th>Hours</th><th></th></tr></thead>
+        <tbody>${state.data.ceLogs.map(l=>`<tr>
+          <td><strong>${escapeHtml(l.title)}</strong></td>
+          <td>${escapeHtml(l.provider||"—")}</td>
+          <td>${escapeHtml(CE_TOPICS.find(t=>t.key===l.topic_area)?.label || l.topic_area)}</td>
+          <td class="num">${fmtDate(l.date_completed)}</td>
+          <td class="num">${l.hours}</td>
+          <td style="display:flex;gap:6px;">
+            ${l.certificate_path?`<a href="#" data-view-cert="${l.certificate_path}" class="btn btn-ghost btn-sm">Cert</a>`:""}
+            <button class="btn btn-ghost btn-sm" data-del-ce="${l.id}">Delete</button>
+          </td>
+        </tr>`).join("")}</tbody>
+      </table></div>` : `<div class="card empty">No continuing education logged yet.</div>`}
+    </div>
+  `;
+}
+function wireRecert(){
+  wireCommonStepActions();
+  const editBtn = document.getElementById("editCertDate");
+  if (editBtn) editBtn.onclick = ()=> openModal(certDateModal());
+  const addBtn = document.getElementById("addCeBtn");
+  if (addBtn) addBtn.onclick = ()=> openModal(ceLogModal());
+  document.querySelectorAll("[data-del-ce]").forEach(b=>{
+    b.onclick = async ()=>{
+      if (!confirm("Delete this training log entry?")) return;
+      await sb.from("ce_logs").delete().eq("id", b.dataset.delCe);
+      await loadTraineeData(state.profile.id);
+      renderContent();
+    };
+  });
+}
+function certDateModal(){
+  const recert = state.data.recert;
+  return {
+    title: "Certification date",
+    body: `
+      <div class="field"><label>Certification type</label>
+        <select id="mCertType">
+          <option value="adult" ${recert?.cert_type==='adult'?'selected':''}>Adult</option>
+          <option value="family" ${recert?.cert_type==='family'?'selected':''}>Family</option>
+          <option value="youth" ${recert?.cert_type==='youth'?'selected':''}>Youth</option>
+        </select></div>
+      <div class="field"><label>Date on your certificate</label>
+        <input type="date" id="mCertDate" value="${recert?.cert_date||''}" required></div>
+    `,
+    onSubmit: async ()=>{
+      const cert_type = document.getElementById("mCertType").value;
+      const cert_date = document.getElementById("mCertDate").value;
+      if (!cert_date) return;
+      await sb.from("recert_cycles").upsert({ user_id: state.profile.id, cert_type, cert_date }, { onConflict:"user_id" });
+      await loadTraineeData(state.profile.id);
+      toast("Certification date saved.");
+      closeModal(); renderContent();
+    }
+  };
+}
+function ceLogModal(){
+  return {
+    title: "Add continuing education",
+    body: `
+      <div class="field"><label>Training title</label><input type="text" id="mTitle" required></div>
+      <div class="field"><label>Provider</label><input type="text" id="mProvider"></div>
+      <div class="field"><label>Topic area</label>
+        <select id="mTopic">${CE_TOPICS.map(t=>`<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("")}</select></div>
+      <div class="field"><label>Date completed</label><input type="date" id="mDate" required></div>
+      <div class="field"><label>Hours</label><input type="number" id="mHours" min="1" step="0.5" required></div>
+      <div class="field"><label>Certificate (optional)</label>
+        <label class="file-drop">Click to choose a file<input type="file" id="mFile" accept=".pdf,.png,.jpg,.jpeg" style="display:none;"></label>
+        <div class="hint" id="mFileName"></div></div>
+    `,
+    afterMount: ()=>{
+      document.getElementById("mFile").onchange = (e)=>{
+        document.getElementById("mFileName").textContent = e.target.files[0]?.name || "";
+      };
+    },
+    onSubmit: async ()=>{
+      const title = document.getElementById("mTitle").value.trim();
+      const provider = document.getElementById("mProvider").value.trim();
+      const topic_area = document.getElementById("mTopic").value;
+      const date_completed = document.getElementById("mDate").value;
+      const hours = Number(document.getElementById("mHours").value);
+      const file = document.getElementById("mFile").files[0];
+      if (!title || !date_completed || !hours) { toast("Please fill in the required fields.","err"); return; }
+      let certificate_path = null;
+      try{
+        if (file) certificate_path = await uploadCertificateFile(file, state.profile.id);
+        await sb.from("ce_logs").insert({ user_id: state.profile.id, title, provider, topic_area, date_completed, hours, certificate_path });
+        await loadTraineeData(state.profile.id);
+        toast("Training logged.");
+        closeModal(); renderContent();
+      }catch(err){ toast(err.message||"Couldn't save","err"); }
+    }
+  };
+}
+
+// ---------------------------------------------------------------------
+// 12. MODAL SYSTEM
+// ---------------------------------------------------------------------
+function openModal(cfg){
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.id = "modalRoot";
+  wrap.innerHTML = `<div class="modal">
+    <div class="modal-head"><h3>${escapeHtml(cfg.title)}</h3><button class="icon-btn" id="modalClose">✕</button></div>
+    <form id="modalForm">${cfg.body}<div style="display:flex;gap:10px;margin-top:6px;">
+      <button type="submit" class="btn btn-primary btn-block">Save</button>
+    </div></form>
+  </div>`;
+  document.body.appendChild(wrap);
+  document.getElementById("modalClose").onclick = closeModal;
+  wrap.onclick = (e)=>{ if (e.target === wrap) closeModal(); };
+  document.getElementById("modalForm").onsubmit = (e)=>{ e.preventDefault(); cfg.onSubmit(); };
+  if (cfg.afterMount) cfg.afterMount();
+}
+function closeModal(){ document.getElementById("modalRoot")?.remove(); }
+
+// ---------------------------------------------------------------------
+// 13. ADMIN VIEWS
+// ---------------------------------------------------------------------
+function renderAdminDashboard(){
+  const trainees = state.adminData.trainees;
+  const certified = state.adminData.allRecert.length;
+  const expSoon = state.adminData.allRecert.filter(r=> daysUntil(r.cycle_end_date) < 90).length;
+  const pendingCerts = state.adminData.allEnrollments.filter(e=>e.status==="completed" && e.certificate_path).length;
+  return `
+    <div class="page-head"><div><div class="eyebrow">Sharpe Pro Development</div><h1>Staff Overview</h1></div></div>
+    <div class="grid grid-3 section">
+      <div class="stat-card card"><div class="stat-label">Trainees</div><div class="stat-value">${trainees.length}</div></div>
+      <div class="stat-card card"><div class="stat-label">Certified (Ohio)</div><div class="stat-value">${certified}</div></div>
+      <div class="stat-card card"><div class="stat-label">Expiring within 90 days</div><div class="stat-value" style="color:${expSoon?'var(--warning)':'inherit'};">${expSoon}</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Recent trainees</h2><button class="btn btn-secondary btn-sm" data-nav2="admin_trainees">View all</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Joined</th></tr></thead>
+        <tbody>${trainees.slice(0,6).map(t=>`<tr><td><strong>${escapeHtml(t.full_name||"")}</strong></td><td>${escapeHtml(t.email||"")}</td><td class="num">${fmtDate(t.created_at?.slice(0,10))}</td></tr>`).join("") || `<tr><td colspan="3" class="empty">No trainees yet.</td></tr>`}</tbody>
+      </table></div>
+    </div>
+    <div class="card" style="background:var(--info-soft);border-color:transparent;">
+      <strong>Adding staff:</strong> after someone signs up in the portal, open the Supabase Table Editor → <code>profiles</code> → change their <code>role</code> to <code>admin</code>. They'll see the staff view next time they log in.
+    </div>
+  `;
+}
+function renderAdminTrainees(){
+  const trainees = state.adminData.trainees;
+  return `
+    <div class="page-head"><div><div class="eyebrow">People</div><h1>Trainees</h1></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Email</th><th>Ohio</th><th>CCAR hrs</th><th>Recert</th><th></th></tr></thead>
+      <tbody>${trainees.map(t=>{
+        const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
+        const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id);
+        const ohioClasses = state.data.classes.filter(c=>c.pathway==="ohio");
+        const ohioDone = ohioClasses.filter(c=>enr.find(e=>e.class_id===c.id && e.status==="completed")).length;
+        const ccarHrs = state.data.classes.filter(c=>c.pathway==="ccar").reduce((s,c)=> s + (enr.find(e=>e.class_id===c.id && e.status==="completed")?Number(c.hours):0),0);
+        return `<tr>
+          <td><strong>${escapeHtml(t.full_name||"")}</strong></td>
+          <td>${escapeHtml(t.email||"")}</td>
+          <td class="num">${ohioDone}/${ohioClasses.length}</td>
+          <td class="num">${ccarHrs}/${CCAR_TOTAL_HOURS}</td>
+          <td>${recert ? `<span class="pill ${daysUntil(recert.cycle_end_date)<90?'pill-warning':'pill-success'}">${fmtDate(recert.cycle_end_date)}</span>` : `<span class="pill pill-neutral">—</span>`}</td>
+          <td><button class="btn btn-secondary btn-sm" data-open-trainee="${t.id}">View</button></td>
+        </tr>`;
+      }).join("") || `<tr><td colspan="6" class="empty">No trainees yet.</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+function renderAdminTraineeDetail(){
+  const t = state.adminData.trainees.find(x=>x.id===state.adminTraineeId);
+  if (!t) return `<div class="empty">Trainee not found.</div>`;
+  const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id);
+  const ce = state.adminData.allCeLogs.filter(l=>l.user_id===t.id);
+  const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
+  const milestones = state.adminData.allMilestones.filter(m=>m.user_id===t.id);
+  return `
+    <button class="btn btn-ghost btn-sm" id="backToTrainees" style="margin-bottom:14px;">← All trainees</button>
+    <div class="page-head"><div><div class="eyebrow">Trainee</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div></div>
+    <div class="section">
+      <div class="section-title"><h2>Class certificates</h2></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Class</th><th>Status</th><th>Completed</th><th></th></tr></thead>
+        <tbody>${state.data.classes.map(c=>{
+          const e = enr.find(x=>x.class_id===c.id);
+          return `<tr><td>${escapeHtml(c.name)}</td>
+            <td><span class="pill ${e?.status==='completed'?'pill-success':e?'pill-brand':'pill-neutral'}">${e?.status==='completed'?'Completed':e?'Enrolled':'Not started'}</span></td>
+            <td class="num">${fmtDate(e?.completed_date)}</td>
+            <td>${e?.certificate_path?`<a href="#" data-view-cert="${e.certificate_path}" class="btn btn-ghost btn-sm">Download</a>`:"—"}</td></tr>`;
+        }).join("")}</tbody>
+      </table></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Certification milestones</h2></div>
+      <div class="checklist">
+        ${[...OHIO_MILESTONES.map(m=>({...m,pathway:'ohio'})), ...CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'}))].map(def=>{
+          const m = milestones.find(x=>x.pathway===def.pathway && x.milestone_key===def.key);
+          return `<div class="check-row ${m?.completed?'done':''}"><span class="check-badge">${m?.completed?"✓":""}</span>
+            <div class="check-body"><div class="check-title">${escapeHtml(def.label)}</div>
+            <div class="check-meta">${def.pathway.toUpperCase()} · ${m?.completed_date?fmtDate(m.completed_date):"Not yet"}</div></div></div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Recertification</h2></div>
+      <div class="card">
+        ${recert ? `<p>Certified <strong>${fmtDate(recert.cert_date)}</strong> · expires <strong>${fmtDate(recert.cycle_end_date)}</strong></p>` : `<p class="muted">No certification date on file.</p>`}
+        <div class="table-wrap" style="margin-top:10px;"><table>
+          <thead><tr><th>Title</th><th>Topic</th><th>Date</th><th>Hours</th><th></th></tr></thead>
+          <tbody>${ce.map(l=>`<tr><td>${escapeHtml(l.title)}</td><td>${escapeHtml(CE_TOPICS.find(t=>t.key===l.topic_area)?.label||l.topic_area)}</td><td class="num">${fmtDate(l.date_completed)}</td><td class="num">${l.hours}</td><td>${l.certificate_path?`<a href="#" data-view-cert="${l.certificate_path}" class="btn btn-ghost btn-sm">Cert</a>`:""}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No CE logged.</td></tr>`}</tbody>
+        </table></div>
+      </div>
+    </div>
+  `;
+}
+function wireAdminTrainees(){
+  document.querySelectorAll("[data-open-trainee]").forEach(b=>{
+    b.onclick = ()=>{ state.adminTraineeId = b.dataset.openTrainee; renderContent(); };
+  });
+}
+function wireAdminTraineeDetail(){
+  document.getElementById("backToTrainees").onclick = ()=>{ state.adminTraineeId = null; renderContent(); };
+  document.querySelectorAll("[data-view-cert]").forEach(el=>{
+    el.onclick = async (e)=>{
+      e.preventDefault();
+      try{ const url = await signedUrlFor(el.dataset.viewCert); window.open(url,"_blank"); }
+      catch(err){ toast(err.message||"Couldn't open file","err"); }
+    };
+  });
+}
+function renderAdminClasses(){
+  return `
+    <div class="page-head"><div><div class="eyebrow">Catalog</div><h1>Manage Classes</h1></div>
+      <button class="btn btn-primary" id="newClassBtn">+ Add class</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Pathway</th><th>Category</th><th>Hours</th><th>Cost</th><th></th></tr></thead>
+      <tbody>${state.data.classes.map(c=>`<tr>
+        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td><span class="pill pill-neutral">${c.pathway.toUpperCase()}</span></td>
+        <td>${escapeHtml(c.category)}</td>
+        <td class="num">${c.hours}</td>
+        <td class="num">${costLabel(c.cost)}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm" data-edit-class="${c.id}">Edit</button>
+          <button class="btn btn-ghost btn-sm" data-del-class="${c.id}">Delete</button>
+        </td>
+      </tr>`).join("") || `<tr><td colspan="6" class="empty">No classes yet.</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+function classFormModal(existing){
+  return {
+    title: existing ? "Edit class" : "Add class",
+    body: `
+      <div class="field"><label>Name</label><input type="text" id="cName" required value="${existing?escapeHtml(existing.name):''}"></div>
+      <div class="field"><label>Pathway</label><select id="cPathway">
+        <option value="ohio" ${existing?.pathway==='ohio'?'selected':''}>Ohio</option>
+        <option value="ccar" ${existing?.pathway==='ccar'?'selected':''}>CCAR</option>
+      </select></div>
+      <div class="field"><label>Category</label><input type="text" id="cCategory" placeholder="core, elective, prerequisite, live_training" value="${existing?escapeHtml(existing.category):''}"></div>
+      <div class="field"><label>Hours</label><input type="number" id="cHours" min="0" step="0.5" required value="${existing?.hours ?? ''}"></div>
+      <div class="field"><label>Cost (leave blank if free)</label><input type="number" id="cCost" min="0" step="1" value="${existing?.cost ?? ''}"></div>
+      <div class="field"><label>Format</label><input type="text" id="cFormat" placeholder="Online, self-paced / Live / etc." value="${existing?escapeHtml(existing.format||''):''}"></div>
+      <div class="field"><label>Class date (optional, for live cohorts)</label><input type="date" id="cDate" value="${existing?.class_date||''}"></div>
+      <div class="field"><label>Description</label><textarea id="cDesc" rows="3">${existing?escapeHtml(existing.description||''):''}</textarea></div>
+    `,
+    onSubmit: async ()=>{
+      const payload = {
+        name: document.getElementById("cName").value.trim(),
+        pathway: document.getElementById("cPathway").value,
+        category: document.getElementById("cCategory").value.trim() || "elective",
+        hours: Number(document.getElementById("cHours").value)||0,
+        cost: document.getElementById("cCost").value ? Number(document.getElementById("cCost").value) : null,
+        format: document.getElementById("cFormat").value.trim(),
+        class_date: document.getElementById("cDate").value || null,
+        description: document.getElementById("cDesc").value.trim(),
+      };
+      if (!payload.name){ toast("Class name is required","err"); return; }
+      if (existing) await sb.from("classes").update(payload).eq("id", existing.id);
+      else await sb.from("classes").insert(payload);
+      await loadAdminData();
+      toast("Class saved.");
+      closeModal(); renderContent();
+    }
+  };
+}
+function wireAdminClasses(){
+  document.getElementById("newClassBtn").onclick = ()=> openModal(classFormModal(null));
+  document.querySelectorAll("[data-edit-class]").forEach(b=>{
+    b.onclick = ()=>{
+      const cls = state.data.classes.find(c=>c.id===b.dataset.editClass);
+      openModal(classFormModal(cls));
+    };
+  });
+  document.querySelectorAll("[data-del-class]").forEach(b=>{
+    b.onclick = async ()=>{
+      if (!confirm("Delete this class? Trainee enrollment records for it will also be removed.")) return;
+      await sb.from("classes").delete().eq("id", b.dataset.delClass);
+      await loadAdminData();
+      renderContent();
+    };
+  });
+}
+
+// ---------------------------------------------------------------------
+// 14. BOOT
+// ---------------------------------------------------------------------
+async function boot(){
+  if (!sb){ state.loading=false; render(); return; }
+  const { data: { session } } = await sb.auth.getSession();
+  state.session = session;
+  if (session){
+    const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+    state.profile = profile;
+    await refreshAll();
+  }
+  state.loading = false;
+  render();
+
+  sb.auth.onAuthStateChange(async (event, session)=>{
+    state.session = session;
+    if (session){
+      state.loading = true; render();
+      const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+      state.profile = profile;
+      await refreshAll();
+      state.loading = false;
+      state.view = state.profile?.role === "admin" ? "admin_dashboard" : "dashboard";
+    } else {
+      state.profile = null;
+    }
+    render();
+  });
+}
+boot();
+</script>
