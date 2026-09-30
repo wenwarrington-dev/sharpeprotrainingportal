@@ -344,6 +344,15 @@ const CCAR_MILESTONES = [
 ];
 const CCAR_TOTAL_HOURS = 60;
 
+const OHIO_SUPERVISOR_MILESTONES = [
+  { key: "qualifying_route", label: "Meet the experience or license requirement",
+    help: "Either 2 cumulative years delivering peer services in behavioral health, or hold a qualifying clinical license (LSW, LISW, LPC, LCDC II/III, LPCC, LICDC, LMFT, LIMFT, psychologist, or psychiatrist), per Ohio Administrative Code 5122-29-15.1." },
+  { key: "curriculum_16hr", label: "Complete the 16-hour Ohio Learn core curriculum",
+    help: "Same curriculum required for PRS/YPS certification — if you're already certified, you don't need to repeat it. Keep the completion certificate on file." },
+  { key: "supervisor_training_4hr", label: "Complete the 4-hour DBH Peer Supporter Supervision Training",
+    help: "Live, online via Zoom. Must be on camera for the full 4 hours, completed on a laptop or desktop (not a phone or tablet), and on time — late arrivals aren't admitted." },
+];
+
 // ---------------------------------------------------------------------
 // 3. STATE
 // ---------------------------------------------------------------------
@@ -403,26 +412,49 @@ async function loadTraineeData(userId){
 }
 
 async function loadAdminData(){
-  const [profilesRes, classesRes, enrollRes, milestoneRes, recertRes, ceRes] = await Promise.all([
+  const [profilesRes, classesRes, enrollRes, milestoneRes, recertRes, ceRes, assignRes] = await Promise.all([
     sb.from("profiles").select("*").order("created_at"),
     sb.from("classes").select("*").order("sort_order"),
     sb.from("enrollments").select("*"),
     sb.from("certification_milestones").select("*"),
     sb.from("recert_cycles").select("*"),
     sb.from("ce_logs").select("*"),
+    sb.from("supervisor_assignments").select("*"),
   ]);
-  state.adminData.trainees = (profilesRes.data || []).filter(p => p.role !== "admin");
-  state.adminData.allStaff = (profilesRes.data || []).filter(p => p.role === "admin");
+  state.adminData.trainees = (profilesRes.data || []).filter(p => p.role === "trainee");
+  state.adminData.allStaff = (profilesRes.data || []).filter(p => p.role !== "trainee");
   state.data.classes = classesRes.data || [];
   state.adminData.allEnrollments = enrollRes.data || [];
   state.adminData.allMilestones = milestoneRes.data || [];
   state.adminData.allRecert = recertRes.data || [];
   state.adminData.allCeLogs = ceRes.data || [];
+  state.adminData.allAssignments = assignRes.data || [];
+}
+
+function isStaffRole(role){
+  return role === "admin" || role === "supervisor" || role === "ccar_facilitator";
+}
+function roleScope(){
+  const r = state.profile.role;
+  if (r === "ccar_facilitator") return "ccar";
+  if (r === "supervisor") return "supervisor";
+  return "admin";
+}
+function roleLabel(role){
+  if (role === "admin") return "Admin";
+  if (role === "supervisor") return "Supervisor";
+  if (role === "ccar_facilitator") return "CCAR Facilitator";
+  return "Trainee";
+}
+function defaultViewForRole(role){
+  if (role === "admin") return "admin_dashboard";
+  if (isStaffRole(role)) return "admin_trainees";
+  return "dashboard";
 }
 
 async function refreshAll(){
   if (!state.session) return;
-  if (state.profile.role === "admin") await loadAdminData();
+  if (isStaffRole(state.profile.role)) await loadAdminData();
   else await loadTraineeData(state.profile.id);
 }
 
@@ -533,6 +565,7 @@ function traineeNav(){
     { id:"dashboard", label:"Dashboard", ic:"⌂" },
     { id:"ohio", label:"Ohio Pathway", ic:"✓" },
     { id:"ccar", label:"CCAR Pathway", ic:"✓" },
+    { id:"ohio_supervisor", label:"Become a Supervisor", ic:"★" },
     { id:"classes", label:"Class Catalog", ic:"☷" },
     { id:"certificates", label:"My Certificates", ic:"⌘" },
     { id:"recert", label:"Recertification", ic:"↻" },
@@ -543,16 +576,23 @@ function adminNav(){
     { id:"admin_dashboard", label:"Overview", ic:"⌂" },
     { id:"admin_trainees", label:"Trainees", ic:"▤" },
     { id:"admin_classes", label:"Manage Classes", ic:"☷" },
+    { id:"admin_staff", label:"Staff & Roles", ic:"⚙" },
   ];
 }
+function supervisorNav(){
+  return [ { id:"admin_trainees", label:"My Peer Coaches", ic:"▤" } ];
+}
+function facilitatorNav(){
+  return [ { id:"admin_trainees", label:"CCAR Trainees", ic:"▤" } ];
+}
 function renderShell(){
-  const isAdmin = state.profile.role === "admin";
-  const nav = isAdmin ? adminNav() : traineeNav();
+  const role = state.profile.role;
+  const nav = role === "admin" ? adminNav() : role === "supervisor" ? supervisorNav() : role === "ccar_facilitator" ? facilitatorNav() : traineeNav();
   return `
   <div class="shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development" style="height:44px;"></div>
-      <span class="pill pill-brand" style="margin:0 6px 4px;width:fit-content;">${isAdmin?"Staff / Admin":"Trainee"}</span>
+      <span class="pill pill-brand" style="margin:0 6px 4px;width:fit-content;">${roleLabel(role)}</span>
       <nav class="navlist">
         ${nav.map(n=>`<button class="navlink ${state.view===n.id?'active':''}" data-nav="${n.id}"><span class="ic">${n.ic}</span>${n.label}</button>`).join("")}
       </nav>
@@ -603,28 +643,38 @@ function renderContent(){
   });
 }
 function renderView(){
-  const isAdmin = state.profile.role === "admin";
-  if (isAdmin){
+  const role = state.profile.role;
+  if (role === "admin"){
     if (state.view === "admin_classes") return renderAdminClasses();
+    if (state.view === "admin_staff") return renderAdminStaff();
     if (state.view === "admin_trainees") return state.adminTraineeId ? renderAdminTraineeDetail() : renderAdminTrainees();
     return renderAdminDashboard();
   }
+  if (role === "supervisor" || role === "ccar_facilitator"){
+    return state.adminTraineeId ? renderAdminTraineeDetail() : renderAdminTrainees();
+  }
   if (state.view === "ohio") return renderPathway("ohio");
   if (state.view === "ccar") return renderPathway("ccar");
+  if (state.view === "ohio_supervisor") return renderPathway("ohio_supervisor");
   if (state.view === "classes") return renderClasses();
   if (state.view === "certificates") return renderCertificates();
   if (state.view === "recert") return renderRecert();
   return renderTraineeDashboard();
 }
 function wireView(){
-  const isAdmin = state.profile.role === "admin";
-  if (isAdmin){
+  const role = state.profile.role;
+  if (role === "admin"){
     if (state.view === "admin_classes") return wireAdminClasses();
+    if (state.view === "admin_staff") return wireAdminStaff();
     if (state.view === "admin_trainees") return state.adminTraineeId ? wireAdminTraineeDetail() : wireAdminTrainees();
     return wireCommonStepActions(); // admin dashboard's "View all" link
   }
+  if (role === "supervisor" || role === "ccar_facilitator"){
+    return state.adminTraineeId ? wireAdminTraineeDetail() : wireAdminTrainees();
+  }
   if (state.view === "ohio") return wirePathway("ohio");
   if (state.view === "ccar") return wirePathway("ccar");
+  if (state.view === "ohio_supervisor") return wirePathway("ohio_supervisor");
   if (state.view === "classes") return wireClasses();
   if (state.view === "certificates") return wireCertificates();
   if (state.view === "recert") return wireRecert();
@@ -662,6 +712,11 @@ function ccarProgress(){
   const pct = Math.min(100, Math.round(100*hoursDone/CCAR_TOTAL_HOURS));
   const rcpDone = !!milestoneFor("ccar","rcp_earned")?.completed;
   return { hoursDone, total: CCAR_TOTAL_HOURS, pct, rcpDone, classes: ccarClasses };
+}
+function supervisorProgress(){
+  const done = OHIO_SUPERVISOR_MILESTONES.filter(def=>!!milestoneFor("ohio_supervisor",def.key)?.completed).length;
+  const total = OHIO_SUPERVISOR_MILESTONES.length;
+  return { done, total, pct: Math.round(100*done/total) };
 }
 function ceProgress(){
   const totalsByTopic = {};
@@ -751,6 +806,20 @@ function renderPathway(pathway){
         <div class="progress"><span style="width:${oh.pct}%;"></span></div>
       </div>
       <div class="checklist">${oh.steps.map((s,i)=>renderStepRow("ohio", s, i)).join("")}</div>
+    `;
+  }
+  if (pathway === "ohio_supervisor"){
+    const sup = supervisorProgress();
+    return `
+      <div class="page-head"><div><div class="eyebrow">Certification pathway</div><h1>Ohio Peer Coach Supervisor</h1>
+        <p style="margin-top:6px;max-width:640px;">Required under Ohio Administrative Code 5122-29-15.1 to supervise certified Peer Recovery Supporters. This is not a state certification — there's no registry or credential issued, so keep both completion certificates on file with your employer to show compliance.</p></div></div>
+      <div class="card section" style="padding:16px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong>${sup.done} of ${sup.total} steps complete</strong><span class="muted">${sup.pct}%</span>
+        </div>
+        <div class="progress"><span style="width:${sup.pct}%;"></span></div>
+      </div>
+      <div class="checklist">${OHIO_SUPERVISOR_MILESTONES.map(def=>renderMilestoneRow("ohio_supervisor", def, !!milestoneFor("ohio_supervisor",def.key)?.completed)).join("")}</div>
     `;
   }
   const cc = ccarProgress();
@@ -1109,16 +1178,18 @@ function renderAdminDashboard(){
       </table></div>
     </div>
     <div class="card" style="background:var(--info-soft);border-color:transparent;">
-      <strong>Adding staff:</strong> after someone signs up in the portal, open the Supabase Table Editor → <code>profiles</code> → change their <code>role</code> to <code>admin</code>. They'll see the staff view next time they log in.
+      <strong>Adding staff:</strong> go to <button class="btn btn-ghost btn-sm" data-nav2="admin_staff" style="padding:2px 8px;">Staff &amp; Roles</button> to give someone the Supervisor or CCAR Facilitator role, or assign peer coaches to a supervisor.
     </div>
   `;
 }
 function renderAdminTrainees(){
+  const scope = roleScope();
   const trainees = state.adminData.trainees;
+  const heading = scope === "supervisor" ? "My Peer Coaches" : scope === "ccar" ? "CCAR Trainees" : "Trainees";
   return `
-    <div class="page-head"><div><div class="eyebrow">People</div><h1>Trainees</h1></div></div>
+    <div class="page-head"><div><div class="eyebrow">People</div><h1>${heading}</h1></div></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Name</th><th>Email</th><th>Ohio</th><th>CCAR hrs</th><th>Recert</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th>${scope!=="ccar"?"<th>Ohio</th>":""}<th>CCAR hrs</th>${scope!=="ccar"?"<th>Recert</th>":""}<th></th></tr></thead>
       <tbody>${trainees.map(t=>{
         const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
         const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id);
@@ -1128,30 +1199,35 @@ function renderAdminTrainees(){
         return `<tr>
           <td><strong>${escapeHtml(t.full_name||"")}</strong></td>
           <td>${escapeHtml(t.email||"")}</td>
-          <td class="num">${ohioDone}/${ohioClasses.length}</td>
+          ${scope!=="ccar"?`<td class="num">${ohioDone}/${ohioClasses.length}</td>`:""}
           <td class="num">${ccarHrs}/${CCAR_TOTAL_HOURS}</td>
-          <td>${recert ? `<span class="pill ${daysUntil(recert.cycle_end_date)<90?'pill-warning':'pill-success'}">${fmtDate(recert.cycle_end_date)}</span>` : `<span class="pill pill-neutral">—</span>`}</td>
+          ${scope!=="ccar"?`<td>${recert ? `<span class="pill ${daysUntil(recert.cycle_end_date)<90?'pill-warning':'pill-success'}">${fmtDate(recert.cycle_end_date)}</span>` : `<span class="pill pill-neutral">—</span>`}</td>`:""}
           <td><button class="btn btn-secondary btn-sm" data-open-trainee="${t.id}">View</button></td>
         </tr>`;
-      }).join("") || `<tr><td colspan="6" class="empty">No trainees yet.</td></tr>`}</tbody>
+      }).join("") || `<tr><td colspan="6" class="empty">No ${scope==='supervisor'?'peer coaches assigned yet':'trainees yet'}.</td></tr>`}</tbody>
     </table></div>
   `;
 }
 function renderAdminTraineeDetail(){
+  const scope = roleScope();
   const t = state.adminData.trainees.find(x=>x.id===state.adminTraineeId);
-  if (!t) return `<div class="empty">Trainee not found.</div>`;
+  if (!t) return `<div class="empty">${scope==='supervisor'?'Peer coach':'Trainee'} not found.</div>`;
   const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id);
   const ce = state.adminData.allCeLogs.filter(l=>l.user_id===t.id);
   const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
   const milestones = state.adminData.allMilestones.filter(m=>m.user_id===t.id);
+  const classesToShow = scope === "ccar" ? state.data.classes.filter(c=>c.pathway==="ccar") : state.data.classes;
+  const milestoneDefs = scope === "ccar"
+    ? CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'}))
+    : [...OHIO_MILESTONES.map(m=>({...m,pathway:'ohio'})), ...CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'})), ...OHIO_SUPERVISOR_MILESTONES.map(m=>({...m,pathway:'ohio_supervisor'}))];
   return `
-    <button class="btn btn-ghost btn-sm" id="backToTrainees" style="margin-bottom:14px;">← All trainees</button>
-    <div class="page-head"><div><div class="eyebrow">Trainee</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div></div>
+    <button class="btn btn-ghost btn-sm" id="backToTrainees" style="margin-bottom:14px;">← ${scope==='supervisor'?'My peer coaches':scope==='ccar'?'CCAR trainees':'All trainees'}</button>
+    <div class="page-head"><div><div class="eyebrow">${scope==='supervisor'?'Peer coach':'Trainee'}</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div></div>
     <div class="section">
       <div class="section-title"><h2>Class certificates</h2></div>
       <div class="table-wrap"><table>
         <thead><tr><th>Class</th><th>Status</th><th>Completed</th><th></th></tr></thead>
-        <tbody>${state.data.classes.map(c=>{
+        <tbody>${classesToShow.map(c=>{
           const e = enr.find(x=>x.class_id===c.id);
           return `<tr><td>${escapeHtml(c.name)}</td>
             <td><span class="pill ${e?.status==='completed'?'pill-success':e?'pill-brand':'pill-neutral'}">${e?.status==='completed'?'Completed':e?'Enrolled':'Not started'}</span></td>
@@ -1163,7 +1239,7 @@ function renderAdminTraineeDetail(){
     <div class="section">
       <div class="section-title"><h2>Certification milestones</h2></div>
       <div class="checklist">
-        ${[...OHIO_MILESTONES.map(m=>({...m,pathway:'ohio'})), ...CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'}))].map(def=>{
+        ${milestoneDefs.map(def=>{
           const m = milestones.find(x=>x.pathway===def.pathway && x.milestone_key===def.key);
           return `<div class="check-row ${m?.completed?'done':''}"><span class="check-badge">${m?.completed?"✓":""}</span>
             <div class="check-body"><div class="check-title">${escapeHtml(def.label)}</div>
@@ -1171,6 +1247,7 @@ function renderAdminTraineeDetail(){
         }).join("")}
       </div>
     </div>
+    ${scope !== "ccar" ? `
     <div class="section">
       <div class="section-title"><h2>Recertification</h2></div>
       <div class="card">
@@ -1180,12 +1257,15 @@ function renderAdminTraineeDetail(){
           <tbody>${ce.map(l=>`<tr><td>${escapeHtml(l.title)}</td><td>${escapeHtml(CE_TOPICS.find(t=>t.key===l.topic_area)?.label||l.topic_area)}</td><td class="num">${fmtDate(l.date_completed)}</td><td class="num">${l.hours}</td><td>${l.certificate_path?`<a href="#" data-view-cert="${l.certificate_path}" class="btn btn-ghost btn-sm">Cert</a>`:""}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No CE logged.</td></tr>`}</tbody>
         </table></div>
       </div>
-    </div>
+    </div>` : ""}
   `;
 }
 function wireAdminTrainees(){
   document.querySelectorAll("[data-open-trainee]").forEach(b=>{
     b.onclick = ()=>{ state.adminTraineeId = b.dataset.openTrainee; renderContent(); };
+  });
+  document.querySelectorAll("[data-nav2]").forEach(el=>{
+    el.onclick = ()=>{ state.view = el.dataset.nav2; state.adminTraineeId = null; renderContent(); };
   });
 }
 function wireAdminTraineeDetail(){
@@ -1272,6 +1352,96 @@ function wireAdminClasses(){
   });
 }
 
+function renderAdminStaff(){
+  const staff = state.adminData.allStaff || [];
+  const supervisors = staff.filter(s=>s.role==="supervisor");
+  const assignments = state.adminData.allAssignments || [];
+  return `
+    <div class="page-head"><div><div class="eyebrow">People</div><h1>Staff &amp; Roles</h1></div></div>
+    <div class="section">
+      <div class="section-title"><h2>Give someone a staff role</h2></div>
+      <div class="card">
+        <div class="field"><label>Trainee</label>
+          <select id="promoteUserSelect">
+            <option value="">Select a trainee…</option>
+            ${state.adminData.trainees.map(t=>`<option value="${t.id}">${escapeHtml(t.full_name||t.email||"")}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><label>New role</label>
+          <select id="promoteRoleSelect">
+            <option value="supervisor">Supervisor</option>
+            <option value="ccar_facilitator">CCAR Facilitator</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" id="promoteBtn">Update role</button>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Current staff</h2></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+        <tbody>${staff.map(s=>`<tr>
+          <td><strong>${escapeHtml(s.full_name||"")}</strong></td><td>${escapeHtml(s.email||"")}</td>
+          <td><span class="pill pill-brand">${roleLabel(s.role)}</span></td>
+          <td>${s.id===state.profile.id?"":`<button class="btn btn-ghost btn-sm" data-demote="${s.id}">Set back to trainee</button>`}</td>
+        </tr>`).join("") || `<tr><td colspan="4" class="empty">No staff accounts yet besides you.</td></tr>`}</tbody>
+      </table></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Peer coach assignments</h2></div>
+      ${supervisors.length ? supervisors.map(sup=>`
+        <div class="card section">
+          <strong>${escapeHtml(sup.full_name||sup.email||"")}</strong>
+          <div class="grid grid-2" style="margin-top:10px;">
+            ${state.adminData.trainees.map(t=>{
+              const assigned = assignments.some(a=>a.supervisor_id===sup.id && a.trainee_id===t.id);
+              return `<label style="display:flex;gap:8px;align-items:center;padding:4px 0;font-size:13.5px;">
+                <input type="checkbox" data-assign-sup="${sup.id}" data-assign-trainee="${t.id}" ${assigned?'checked':''}>
+                ${escapeHtml(t.full_name||t.email||"")}
+              </label>`;
+            }).join("") || `<span class="muted">No trainees yet.</span>`}
+          </div>
+        </div>
+      `).join("") : `<div class="card empty">Make someone a Supervisor above to assign peer coaches to them.</div>`}
+    </div>
+  `;
+}
+function wireAdminStaff(){
+  const promoteBtn = document.getElementById("promoteBtn");
+  if (promoteBtn) promoteBtn.onclick = async ()=>{
+    const uid = document.getElementById("promoteUserSelect").value;
+    const role = document.getElementById("promoteRoleSelect").value;
+    if (!uid){ toast("Pick a trainee first","err"); return; }
+    const { error } = await sb.from("profiles").update({ role }).eq("id", uid);
+    if (error){ toast(error.message,"err"); return; }
+    await loadAdminData();
+    toast("Role updated.");
+    renderContent();
+  };
+  document.querySelectorAll("[data-demote]").forEach(b=>{
+    b.onclick = async ()=>{
+      if (!confirm("Set this person back to a regular trainee account?")) return;
+      await sb.from("profiles").update({ role: "trainee" }).eq("id", b.dataset.demote);
+      await loadAdminData();
+      renderContent();
+    };
+  });
+  document.querySelectorAll("[data-assign-sup]").forEach(cb=>{
+    cb.onchange = async ()=>{
+      const supervisor_id = cb.dataset.assignSup;
+      const trainee_id = cb.dataset.assignTrainee;
+      if (cb.checked){
+        const { error } = await sb.from("supervisor_assignments").insert({ supervisor_id, trainee_id });
+        if (error) toast(error.message,"err");
+      } else {
+        await sb.from("supervisor_assignments").delete().eq("supervisor_id", supervisor_id).eq("trainee_id", trainee_id);
+      }
+      await loadAdminData();
+    };
+  });
+}
+
 // ---------------------------------------------------------------------
 // 14. BOOT
 // ---------------------------------------------------------------------
@@ -1295,7 +1465,7 @@ async function boot(){
       state.profile = profile;
       await refreshAll();
       state.loading = false;
-      state.view = state.profile?.role === "admin" ? "admin_dashboard" : "dashboard";
+      state.view = defaultViewForRole(state.profile?.role);
     } else {
       state.profile = null;
     }
