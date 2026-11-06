@@ -167,7 +167,7 @@
   .auth-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);
     border-radius:var(--radius-lg);padding:32px 28px;box-shadow:var(--shadow-md);}
   .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
-  .brand-row img{height:48px;width:auto;display:block;}
+  .brand-row img{height:104px;width:auto;display:block;}
   .tab-row{display:flex;gap:4px;background:var(--surface-sunken);padding:4px;border-radius:10px;margin-bottom:20px;}
   .tab-btn{flex:1;padding:8px 10px;border-radius:7px;border:none;background:transparent;cursor:pointer;
     font-weight:600;font-size:13.5px;color:var(--ink-faint);}
@@ -247,6 +247,7 @@
   .check-title{font-weight:700;font-size:14.5px;}
   .check-meta{font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
   .check-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+  a.btn{text-decoration:none;}
 
   .modal-backdrop{position:fixed;inset:0;background:rgba(20,12,38,.45);display:flex;align-items:center;justify-content:center;
     padding:20px;z-index:50;}
@@ -326,13 +327,44 @@ const CE_TOPICS = [
 const CE_TOTAL_REQUIRED = 30;
 const RECERT_CYCLE_YEARS = 2;
 
+const OHIO_LEARN_URL = "https://dbh.ohio.gov/community-partners/peer-supporters/resources/ohio-learn/ohio-learn";
+const DBH_40_URL = "https://dbh.ohio.gov/community-partners/peer-supporters/certified-peer-recovery-supporter-cprs-adult/paths-to-certification/complete-the-dbh-prs-training/complete-the-dbh-40-hour-prs-training";
+const DBH_40_CALENDAR_URL = "https://dbh.ohio.gov/community-partners/peer-supporters/certified-peer-recovery-supporter-cprs-adult/paths-to-certification/complete-the-dbh-prs-training/complete-the-dbh-40-hour-prs-training/01-dbh-40-hour-prs-training-calendar";
+const ELICENSE_URL = "https://elicense.ohio.gov";
+const SUPERVISION_TRAINING_URL = "https://www.eventbrite.com/e/ohio-department-of-behavioral-health-peer-supporter-supervision-training-tickets-159118113561";
+const OHIO_RENEWAL_URL = "https://dbh.ohio.gov/community-partners/peer-supporters/apply-for-peer-supporter-certification-renewal";
+const OHIO_CE_LOG_URL = "https://dam.assets.ohio.gov/image/upload/mha.ohio.gov/CommunityPartners/PeerSupporters/Resources/Continuing-Education-Log-Peer-Supporter-Renewal.pdf";
+const CE_PROVIDERS = [
+  { name:"OhioPRO", note:"Free monthly virtual Lunch & Learn, 1 CE hour each. Also hosts workforce training institutes.", url:"https://ohio-pro.com/events/" },
+  { name:"NAMI Ohio", note:"Trainings and webinars for Ohio peer supporters.", url:"https://namiohio.org/" },
+  { name:"Weitzman Institute (Ohio ECHO)", note:"Peer supporter and supervision webinar series for Ohio.", url:"https://education.weitzmaninstitute.org/" },
+  { name:"Zepf Center", note:"Webinars and trainings open to certified peer supporters.", url:"https://www.zepfcenter.org" },
+  { name:"Hope Recovery Community", note:"Recovery community trainings.", url:"https://www.hoperecoverycommunity.org/" },
+  { name:"P.E.E.R. Center", note:"Peer-led trainings.", url:"https://www.thepeercenter.org/" },
+  { name:"Courage to Caregivers", note:"Peer support and leadership training.", url:"https://www.couragetocaregivers.org/" },
+];
+const OAC_RULE_URL = "https://mha.ohio.gov/static/CommunityPartners/PeerSupporters/Ohio-Administrative-Code-Adult-Family-and-Youth-certified-Peer-Supporter.pdf";
+
+// Links shown next to Ohio classes, keyed by category so renaming a class in the catalog never breaks them.
+function classLinks(cls){
+  if (cls.pathway === "ohio" && cls.category === "prerequisite") return [{ label:"Go to Ohio Learn", url:OHIO_LEARN_URL }];
+  if (cls.pathway === "ohio" && cls.category === "live_training") return [
+    { label:"See dates and register", url:DBH_40_CALENDAR_URL }, { label:"About the 40-hour training", url:DBH_40_URL } ];
+  return [];
+}
+function linkButtons(links){
+  return (links||[]).map(l=>`<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">${escapeHtml(l.label)} ↗</a>`).join("");
+}
+
 const OHIO_MILESTONES = [
   { key: "background_check", label: "Complete BCI + FBI criminal background checks",
     help: "Have both sent directly from the background check agency to: Ohio Department of Behavioral Health, ATTN: Peer Services, 30 East Broad Street, 36th Floor, Columbus, OH 43215. BCI code: “Other: Ohio Certified Peer Recovery Supporter.” FBI code: “Volunteer Children’s Act.” Must include “Peer Services” in the address or it won’t arrive." },
   { key: "elicense_applied", label: "Apply for certification in eLicense",
-    help: "Create an account at elicense.ohio.gov and upload your completion certificates there." },
+    help: "Create an account at elicense.ohio.gov and upload your completion certificates there.",
+    links: [{ label:"Open eLicense", url:ELICENSE_URL }] },
   { key: "exam_passed", label: "Pass the online Peer Recovery Supporter Certification Exam",
-    help: "110 multiple-choice questions, 70% to pass, up to 3 attempts. Must be completed in one sitting, on a laptop or desktop." },
+    help: "110 multiple-choice questions, 70% to pass, up to 3 attempts. Must be completed in one sitting, on a laptop or desktop.",
+    links: [{ label:"Open eLicense", url:ELICENSE_URL }] },
   { key: "certified", label: "Receive Ohio Peer Recovery Supporter Certification",
     help: "Arrives by email through eLicense, usually within 14 business days of passing the exam. This date starts the 2-year recertification clock — add it under Recertification once received." },
 ];
@@ -346,11 +378,14 @@ const CCAR_TOTAL_HOURS = 60;
 
 const OHIO_SUPERVISOR_MILESTONES = [
   { key: "qualifying_route", label: "Meet the experience or license requirement",
-    help: "Either 2 cumulative years delivering peer services in behavioral health, or hold a qualifying clinical license (LSW, LISW, LPC, LCDC II/III, LPCC, LICDC, LMFT, LIMFT, psychologist, or psychiatrist), per Ohio Administrative Code 5122-29-15.1." },
+    help: "Either 2 cumulative years delivering peer services in behavioral health, or hold a qualifying clinical license (LSW, LISW, LPC, LCDC II/III, LPCC, LICDC, LMFT, LIMFT, psychologist, or psychiatrist), per Ohio Administrative Code 5122-29-15.1.",
+    links: [{ label:"Read the Ohio rule", url:OAC_RULE_URL }] },
   { key: "curriculum_16hr", label: "Complete the 16-hour Ohio Learn core curriculum",
-    help: "Same curriculum required for PRS/YPS certification — if you're already certified, you don't need to repeat it. Keep the completion certificate on file." },
+    help: "Same curriculum required for PRS/YPS certification — if you're already certified, you don't need to repeat it. Keep the completion certificate on file.",
+    links: [{ label:"Go to Ohio Learn", url:OHIO_LEARN_URL }] },
   { key: "supervisor_training_4hr", label: "Complete the 4-hour DBH Peer Supporter Supervision Training",
-    help: "Live, online via Zoom. Must be on camera for the full 4 hours, completed on a laptop or desktop (not a phone or tablet), and on time — late arrivals aren't admitted." },
+    help: "Live, online via Zoom. Must be on camera for the full 4 hours, completed on a laptop or desktop (not a phone or tablet), and on time — late arrivals aren't admitted.",
+    links: [{ label:"Register for the 4-hour training", url:SUPERVISION_TRAINING_URL }] },
 ];
 
 // ---------------------------------------------------------------------
@@ -383,6 +418,10 @@ function toast(msg, kind){
   el.textContent = msg;
   wrap.appendChild(el);
   setTimeout(()=>el.remove(), 4200);
+}
+function dateRange(start, end){
+  if (start && end && start !== end) return `${fmtDate(start)} to ${fmtDate(end)}`;
+  return fmtDate(end || start);
 }
 function costLabel(cost){
   if (cost === 0) return "Free";
@@ -591,7 +630,7 @@ function renderShell(){
   return `
   <div class="shell">
     <aside class="sidebar" id="sidebar">
-      <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development" style="height:44px;"></div>
+      <div class="brand-row"><img src="${LOGO_DATA_URI}" alt="Sharpe Pro Development" style="height:84px;"></div>
       <span class="pill pill-brand" style="margin:0 6px 4px;width:fit-content;">${roleLabel(role)}</span>
       <nav class="navlist">
         ${nav.map(n=>`<button class="navlink ${state.view===n.id?'active':''}" data-nav="${n.id}"><span class="ic">${n.ic}</span>${n.label}</button>`).join("")}
@@ -859,12 +898,13 @@ function renderClassStepRow(cls){
     <div class="check-body">
       <div class="check-title">${escapeHtml(cls.name)}</div>
       <div class="check-meta">${cls.hours} hrs · ${costLabel(cls.cost)} · ${escapeHtml(cls.format||"")}</div>
+      ${done ? `<div class="check-meta"><strong>Course dates:</strong> ${dateRange(en.start_date, en.completed_date)}</div>` : ""}
       <div class="check-actions">
+        ${linkButtons(classLinks(cls))}
         ${done
           ? `<a href="#" data-view-cert="${en.certificate_path||''}" class="btn btn-secondary btn-sm">${en.certificate_path? "View certificate":"No certificate on file"}</a>
-             <button class="btn btn-ghost btn-sm" data-recert-start="${en.completed_date||''}" data-classid="${cls.id}">${cls.pathway==='ohio'?'':''}</button>`
-          : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">Mark complete + upload certificate
-              <input type="file" accept=".pdf,.png,.jpg,.jpeg" style="display:none;" data-upload-class="${cls.id}"></label>`}
+             <button class="btn btn-ghost btn-sm" data-complete-class="${cls.id}">Edit dates / certificate</button>`
+          : `<button class="btn btn-secondary btn-sm" data-complete-class="${cls.id}">Mark complete + add dates</button>`}
       </div>
     </div>
   </div>`;
@@ -875,8 +915,13 @@ function renderMilestoneRow(pathway, def, done){
     <div class="check-body">
       <div class="check-title">${escapeHtml(def.label)}</div>
       ${def.help?`<div class="check-meta">${escapeHtml(def.help)}</div>`:""}
+      ${done ? `<div class="check-meta"><strong>Date completed:</strong> ${fmtDate(milestoneFor(pathway, def.key)?.completed_date)}</div>` : ""}
       <div class="check-actions">
-        <button class="btn ${done?'btn-ghost':'btn-secondary'} btn-sm" data-toggle-milestone="${pathway}:${def.key}">${done? "Mark not done":"Mark done"}</button>
+        ${linkButtons(def.links)}
+        ${done
+          ? `<button class="btn btn-ghost btn-sm" data-milestone-date="${pathway}:${def.key}">Edit date</button>
+             <button class="btn btn-ghost btn-sm" data-toggle-milestone="${pathway}:${def.key}">Mark not done</button>`
+          : `<button class="btn btn-secondary btn-sm" data-milestone-date="${pathway}:${def.key}">Mark done + add date</button>`}
       </div>
     </div>
   </div>`;
@@ -885,25 +930,8 @@ function wirePathway(pathway){
   wireCommonStepActions();
 }
 function wireCommonStepActions(){
-  document.querySelectorAll("[data-upload-class]").forEach(el=>{
-    el.onchange = async (e)=>{
-      const file = e.target.files[0]; if (!file) return;
-      const classId = el.dataset.uploadClass;
-      try{
-        const path = await uploadCertificateFile(file, state.profile.id);
-        const existing = enrollmentFor(classId);
-        const payload = { user_id: state.profile.id, class_id: classId, status:"completed",
-          completed_date: new Date().toISOString().slice(0,10), certificate_path: path };
-        if (existing){
-          await sb.from("enrollments").update(payload).eq("id", existing.id);
-        } else {
-          await sb.from("enrollments").insert(payload);
-        }
-        await loadTraineeData(state.profile.id);
-        toast("Certificate uploaded and class marked complete.");
-        renderContent();
-      }catch(err){ toast(err.message || "Upload failed", "err"); }
-    };
+  document.querySelectorAll("[data-complete-class]").forEach(el=>{
+    el.onclick = ()=> openModal(classCompleteModal(el.dataset.completeClass));
   });
   document.querySelectorAll("[data-view-cert]").forEach(el=>{
     el.onclick = async (e)=>{
@@ -914,17 +942,24 @@ function wireCommonStepActions(){
       catch(err){ toast(err.message||"Couldn't open file","err"); }
     };
   });
+  document.querySelectorAll("[data-milestone-date]").forEach(el=>{
+    el.onclick = ()=>{
+      const [pathway, key] = el.dataset.milestoneDate.split(":");
+      openModal(milestoneDateModal(pathway, key));
+    };
+  });
   document.querySelectorAll("[data-toggle-milestone]").forEach(el=>{
     el.onclick = async ()=>{
       const [pathway, key] = el.dataset.toggleMilestone.split(":");
-      const existing = milestoneFor(pathway, key);
-      const completed = !(existing?.completed);
-      const payload = { user_id: state.profile.id, pathway, milestone_key:key, completed,
-        completed_date: completed ? new Date().toISOString().slice(0,10) : null };
-      await sb.from("certification_milestones").upsert(payload, { onConflict:"user_id,pathway,milestone_key" });
-      await loadTraineeData(state.profile.id);
-      toast(completed?"Marked complete.":"Marked not done.");
-      renderContent();
+      try{
+        const res = await sb.from("certification_milestones").upsert(
+          { user_id: state.profile.id, pathway, milestone_key:key, completed:false, completed_date:null },
+          { onConflict:"user_id,pathway,milestone_key" });
+        if (res.error) throw res.error;
+        await loadTraineeData(state.profile.id);
+        toast("Marked not done.");
+        renderContent();
+      }catch(err){ toast(err.message || "Couldn't save","err"); }
     };
   });
   document.querySelectorAll("[data-nav2]").forEach(el=>{
@@ -950,19 +985,20 @@ function renderClasses(){
           <thead><tr><th>Class</th><th>Hours</th><th>Cost</th><th>Format</th><th>Status</th><th></th></tr></thead>
           <tbody>${list.map(c=>{
             const en = enrollmentFor(c.id);
-            const status = en?.status === "completed" ? `<span class="pill pill-success">Completed</span>` :
+            const status = en?.status === "completed" ? `<span class="pill pill-success">Completed</span><div class="muted" style="margin-top:4px;">${dateRange(en.start_date, en.completed_date)}</div>` :
               en?.status === "enrolled" ? `<span class="pill pill-brand">Enrolled</span>` :
               `<span class="pill pill-neutral">Not started</span>`;
             return `<tr>
-              <td><strong>${escapeHtml(c.name)}</strong><div class="muted" style="max-width:360px;">${escapeHtml(c.description||"")}</div></td>
+              <td><strong>${escapeHtml(c.name)}</strong><div class="muted" style="max-width:360px;">${escapeHtml(c.description||"")}</div>
+                ${classLinks(c).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${linkButtons(classLinks(c))}</div>`:""}</td>
               <td class="num">${c.hours}</td>
               <td class="num">${costLabel(c.cost)}</td>
               <td>${escapeHtml(c.format||"—")}</td>
               <td>${status}</td>
               <td>${en?.status==="completed"
-                  ? `<a href="#" data-view-cert="${en.certificate_path||''}" class="btn btn-ghost btn-sm">Certificate</a>`
-                  : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">Upload cert
-                      <input type="file" accept=".pdf,.png,.jpg,.jpeg" style="display:none;" data-upload-class="${c.id}"></label>`}</td>
+                  ? `<a href="#" data-view-cert="${en.certificate_path||''}" class="btn btn-ghost btn-sm">Certificate</a>
+                     <button class="btn btn-ghost btn-sm" data-complete-class="${c.id}">Edit</button>`
+                  : `<button class="btn btn-secondary btn-sm" data-complete-class="${c.id}">Mark complete</button>`}</td>
             </tr>`;
           }).join("")}</tbody>
         </table></div>
@@ -978,7 +1014,7 @@ function wireClasses(){ wireCommonStepActions(); }
 function renderCertificates(){
   const classCerts = state.data.enrollments.filter(e=>e.certificate_path).map(e=>{
     const cls = state.data.classes.find(c=>c.id===e.class_id);
-    return { title: cls?cls.name:"Class", date: e.completed_date, path: e.certificate_path, kind:"Class certificate" };
+    return { title: cls?cls.name:"Class", date: e.completed_date, label: dateRange(e.start_date, e.completed_date), path: e.certificate_path, kind:"Class certificate" };
   });
   const ceCerts = state.data.ceLogs.filter(l=>l.certificate_path).map(l=>({
     title: l.title, date: l.date_completed, path: l.certificate_path, kind:"CE certificate"
@@ -991,7 +1027,7 @@ function renderCertificates(){
       <tbody>${all.map(c=>`<tr>
         <td><strong>${escapeHtml(c.title)}</strong></td>
         <td><span class="pill pill-neutral">${c.kind}</span></td>
-        <td class="num">${fmtDate(c.date)}</td>
+        <td class="num">${c.label || fmtDate(c.date)}</td>
         <td><a href="#" data-view-cert="${c.path}" class="btn btn-secondary btn-sm">Download</a></td>
       </tr>`).join("")}</tbody>
     </table></div>` : `<div class="card empty">No certificates uploaded yet. Upload one from the Class Catalog or Recertification page.</div>`}
@@ -1036,6 +1072,23 @@ function renderRecert(){
         }).join("")}
       </div>
     </div>
+    <div class="card section">
+      <h3>Find continuing education</h3>
+      <p class="muted" style="margin:4px 0 12px;">Each training needs to be at least 1 hour and come with a certificate of completion or participation showing your name and the training time. Upload it to eLicense at renewal, and keep it here too.</p>
+      <div class="check-actions" style="margin-bottom:14px;">
+        ${linkButtons([
+          { label:"Official Ohio CE log (PDF)", url:OHIO_CE_LOG_URL },
+          { label:"Renewal instructions", url:OHIO_RENEWAL_URL },
+          { label:"Open eLicense", url:ELICENSE_URL },
+        ])}
+      </div>
+      <div style="font-weight:600;font-size:13.5px;margin-bottom:6px;">Places that offer CE for Ohio peer supporters</div>
+      ${CE_PROVIDERS.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div><strong style="font-size:13.5px;">${escapeHtml(c.name)}</strong><div class="muted" style="font-size:12.5px;">${escapeHtml(c.note)}</div></div>
+        ${linkButtons([{ label:"Visit", url:c.url }])}
+      </div>`).join("")}
+      <p class="muted" style="margin-top:10px;font-size:12.5px;">Check that a training covers one of the required topics above, or counts as a general human services or peer support topic, before you sign up.</p>
+    </div>
     <div class="section">
       <div class="section-title"><h2>Training log</h2><button class="btn btn-primary btn-sm" id="addCeBtn">+ Add training</button></div>
       ${state.data.ceLogs.length ? `<div class="table-wrap"><table>
@@ -1069,6 +1122,76 @@ function wireRecert(){
       renderContent();
     };
   });
+}
+function milestoneDefFor(pathway, key){
+  const list = pathway==="ohio" ? OHIO_MILESTONES : pathway==="ccar" ? CCAR_MILESTONES : OHIO_SUPERVISOR_MILESTONES;
+  return list.find(d=>d.key===key);
+}
+function milestoneDateModal(pathway, key){
+  const def = milestoneDefFor(pathway, key);
+  const m = milestoneFor(pathway, key);
+  const today = new Date().toISOString().slice(0,10);
+  return {
+    title: def ? def.label : "Date completed",
+    body: `<div class="field"><label>Date completed</label>
+      <input type="date" id="mDate" value="${m?.completed_date || today}" max="${today}" required>
+      <div class="hint">The day you finished or submitted this step. Change it if it happened earlier.</div></div>`,
+    onSubmit: async ()=>{
+      const completed_date = document.getElementById("mDate").value;
+      if (!completed_date){ toast("Please enter the date.","err"); return; }
+      try{
+        const res = await sb.from("certification_milestones").upsert(
+          { user_id: state.profile.id, pathway, milestone_key:key, completed:true, completed_date },
+          { onConflict:"user_id,pathway,milestone_key" });
+        if (res.error) throw res.error;
+        await loadTraineeData(state.profile.id);
+        toast("Saved.");
+        closeModal(); renderContent();
+      }catch(err){ toast(err.message || "Couldn't save","err"); }
+    }
+  };
+}
+function classCompleteModal(classId){
+  const cls = state.data.classes.find(c=>c.id===classId);
+  const en = enrollmentFor(classId);
+  return {
+    title: cls ? cls.name : "Course dates",
+    body: `
+      <div class="field"><label>First day of the course</label><input type="date" id="mStart" value="${en?.start_date||''}" required></div>
+      <div class="field"><label>Last day of the course</label><input type="date" id="mEnd" value="${en?.completed_date||''}" required>
+        <div class="hint">One-day course? Use the same date for both. For a 2-day or 5-day training, enter the first and last day.</div></div>
+      <div class="field"><label>Certificate of completion ${en?.certificate_path ? "(already on file, only choose a file to replace it)" : "(optional, you can add it later)"}</label>
+        <label class="file-drop">Click to choose a file<input type="file" id="mFile" accept=".pdf,.png,.jpg,.jpeg" style="display:none;"></label>
+        <div class="hint" id="mFileName"></div></div>
+    `,
+    afterMount: ()=>{
+      const st = document.getElementById("mStart"), ed = document.getElementById("mEnd");
+      st.onchange = ()=>{ if (!ed.value || ed.value < st.value) ed.value = st.value; };
+      document.getElementById("mFile").onchange = (e)=>{
+        document.getElementById("mFileName").textContent = e.target.files[0]?.name || "";
+      };
+    },
+    onSubmit: async ()=>{
+      const start_date = document.getElementById("mStart").value;
+      const end_date = document.getElementById("mEnd").value;
+      const file = document.getElementById("mFile").files[0];
+      if (!start_date || !end_date){ toast("Please enter both dates.","err"); return; }
+      if (end_date < start_date){ toast("The last day can't be before the first day.","err"); return; }
+      try{
+        let certificate_path = en?.certificate_path || null;
+        if (file) certificate_path = await uploadCertificateFile(file, state.profile.id);
+        const payload = { user_id: state.profile.id, class_id: classId, status:"completed",
+          start_date, completed_date: end_date, certificate_path };
+        const res = en
+          ? await sb.from("enrollments").update(payload).eq("id", en.id)
+          : await sb.from("enrollments").insert(payload);
+        if (res.error) throw res.error;
+        await loadTraineeData(state.profile.id);
+        toast("Course saved.");
+        closeModal(); renderContent();
+      }catch(err){ toast(err.message || "Couldn't save","err"); }
+    }
+  };
 }
 function certDateModal(){
   const recert = state.data.recert;
@@ -1187,7 +1310,8 @@ function renderAdminTrainees(){
   const trainees = state.adminData.trainees;
   const heading = scope === "supervisor" ? "My Peer Coaches" : scope === "ccar" ? "CCAR Trainees" : "Trainees";
   return `
-    <div class="page-head"><div><div class="eyebrow">People</div><h1>${heading}</h1></div></div>
+    <div class="page-head"><div><div class="eyebrow">People</div><h1>${heading}</h1></div>
+      ${canExportCsv() ? `<button class="btn btn-secondary" id="exportCsvBtn">Download CSV</button>` : ""}</div>
     <div class="table-wrap"><table>
       <thead><tr><th>Name</th><th>Email</th>${scope!=="ccar"?"<th>Ohio</th>":""}<th>CCAR hrs</th>${scope!=="ccar"?"<th>Recert</th>":""}<th></th></tr></thead>
       <tbody>${trainees.map(t=>{
@@ -1222,16 +1346,17 @@ function renderAdminTraineeDetail(){
     : [...OHIO_MILESTONES.map(m=>({...m,pathway:'ohio'})), ...CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'})), ...OHIO_SUPERVISOR_MILESTONES.map(m=>({...m,pathway:'ohio_supervisor'}))];
   return `
     <button class="btn btn-ghost btn-sm" id="backToTrainees" style="margin-bottom:14px;">← ${scope==='supervisor'?'My peer coaches':scope==='ccar'?'CCAR trainees':'All trainees'}</button>
-    <div class="page-head"><div><div class="eyebrow">${scope==='supervisor'?'Peer coach':'Trainee'}</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div></div>
+    <div class="page-head"><div><div class="eyebrow">${scope==='supervisor'?'Peer coach':'Trainee'}</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div>
+      ${canExportCsv() ? `<button class="btn btn-secondary" id="exportTraineeCsvBtn">Download CSV</button>` : ""}</div>
     <div class="section">
       <div class="section-title"><h2>Class certificates</h2></div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Class</th><th>Status</th><th>Completed</th><th></th></tr></thead>
+        <thead><tr><th>Class</th><th>Status</th><th>Course dates</th><th></th></tr></thead>
         <tbody>${classesToShow.map(c=>{
           const e = enr.find(x=>x.class_id===c.id);
           return `<tr><td>${escapeHtml(c.name)}</td>
             <td><span class="pill ${e?.status==='completed'?'pill-success':e?'pill-brand':'pill-neutral'}">${e?.status==='completed'?'Completed':e?'Enrolled':'Not started'}</span></td>
-            <td class="num">${fmtDate(e?.completed_date)}</td>
+            <td class="num">${dateRange(e?.start_date, e?.completed_date)}</td>
             <td>${e?.certificate_path?`<a href="#" data-view-cert="${e.certificate_path}" class="btn btn-ghost btn-sm">Download</a>`:"—"}</td></tr>`;
         }).join("")}</tbody>
       </table></div>
@@ -1260,7 +1385,62 @@ function renderAdminTraineeDetail(){
     </div>` : ""}
   `;
 }
+// ---------- CSV EXPORT (admin only) ----------
+function canExportCsv(){
+  const native = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+  return state.profile.role === "admin" && !native;
+}
+function csvCell(v){
+  let s = String(v ?? "");
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // keeps spreadsheet apps from treating typed text as a formula
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+function downloadCsv(filename, rows){
+  const csv = "﻿" + rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], { type:"text/csv;charset=utf-8;" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+}
+const CSV_HEADER = ["Name","Email","Type","Course","Pathway or topic","Provider","Hours","Status","Start date","Date completed","Certificate on file"];
+function courseRowsFor(t){
+  const rows = [];
+  state.adminData.allEnrollments.filter(e=>e.user_id===t.id).forEach(e=>{
+    const c = state.data.classes.find(x=>x.id===e.class_id);
+    rows.push([t.full_name||"", t.email||"", "Class", c?c.name:"(class removed)", c?c.pathway.toUpperCase():"", "Sharpe Pro Development",
+      c?c.hours:"", e.status==="completed"?"Completed":"Enrolled", e.start_date||"", e.completed_date||"", e.certificate_path?"Yes":"No"]);
+  });
+  state.adminData.allCeLogs.filter(l=>l.user_id===t.id).forEach(l=>{
+    const topic = CE_TOPICS.find(x=>x.key===l.topic_area)?.label || l.topic_area;
+    rows.push([t.full_name||"", t.email||"", "Continuing education", l.title, topic, l.provider||"",
+      l.hours, "Completed", "", l.date_completed||"", l.certificate_path?"Yes":"No"]);
+  });
+  state.adminData.allMilestones.filter(m=>m.user_id===t.id && m.completed).forEach(m=>{
+    const def = milestoneDefFor(m.pathway, m.milestone_key);
+    const pw = m.pathway==="ohio_supervisor" ? "OHIO SUPERVISOR" : String(m.pathway).toUpperCase();
+    rows.push([t.full_name||"", t.email||"", "Application / pathway step", def?def.label:m.milestone_key, pw, "",
+      "", "Completed", "", m.completed_date||"", ""]);
+  });
+  return rows.sort((a,b)=> String(a[9]).localeCompare(String(b[9])));
+}
+function exportAllCoursesCsv(){
+  const rows = [];
+  [...state.adminData.trainees].sort((a,b)=>(a.full_name||"").localeCompare(b.full_name||""))
+    .forEach(t=> rows.push(...courseRowsFor(t)));
+  if (!rows.length){ toast("No courses recorded yet.","err"); return; }
+  downloadCsv(`sharpe-pro-courses-${new Date().toISOString().slice(0,10)}.csv`, [CSV_HEADER, ...rows]);
+}
+function exportTraineeCoursesCsv(t){
+  const rows = courseRowsFor(t);
+  if (!rows.length){ toast("No courses recorded for this person yet.","err"); return; }
+  const slug = (t.full_name||"trainee").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  downloadCsv(`${slug}-courses-${new Date().toISOString().slice(0,10)}.csv`, [CSV_HEADER, ...rows]);
+}
+
 function wireAdminTrainees(){
+  const exp = document.getElementById("exportCsvBtn");
+  if (exp) exp.onclick = exportAllCoursesCsv;
   document.querySelectorAll("[data-open-trainee]").forEach(b=>{
     b.onclick = ()=>{ state.adminTraineeId = b.dataset.openTrainee; renderContent(); };
   });
@@ -1270,6 +1450,11 @@ function wireAdminTrainees(){
 }
 function wireAdminTraineeDetail(){
   document.getElementById("backToTrainees").onclick = ()=>{ state.adminTraineeId = null; renderContent(); };
+  const expOne = document.getElementById("exportTraineeCsvBtn");
+  if (expOne) expOne.onclick = ()=>{
+    const t = state.adminData.trainees.find(x=>x.id===state.adminTraineeId);
+    if (t) exportTraineeCoursesCsv(t);
+  };
   document.querySelectorAll("[data-view-cert]").forEach(el=>{
     el.onclick = async (e)=>{
       e.preventDefault();
