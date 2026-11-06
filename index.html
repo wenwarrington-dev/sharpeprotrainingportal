@@ -396,6 +396,8 @@ const state = {
   profile: null,
   view: "dashboard",
   adminTraineeId: null,
+  csvIncludeSteps: false,
+  groupFilter: "",
   data: { classes: [], enrollments: [], milestones: [], recert: null, ceLogs: [] },
   adminData: { trainees: [], allEnrollments: [], allMilestones: [], allRecert: [], allCeLogs: [] },
   loading: true,
@@ -460,7 +462,9 @@ async function loadAdminData(){
     sb.from("ce_logs").select("*"),
     sb.from("supervisor_assignments").select("*"),
   ]);
-  state.adminData.trainees = (profilesRes.data || []).filter(p => p.role === "trainee");
+  const myGroup = (state.profile.employer||"").trim().toLowerCase();
+  state.adminData.trainees = (profilesRes.data || []).filter(p => p.role === "trainee"
+    && (state.profile.role !== "training_admin" || (myGroup && (p.employer||"").trim().toLowerCase() === myGroup)));
   state.adminData.allStaff = (profilesRes.data || []).filter(p => p.role !== "trainee");
   state.data.classes = classesRes.data || [];
   state.adminData.allEnrollments = enrollRes.data || [];
@@ -471,18 +475,20 @@ async function loadAdminData(){
 }
 
 function isStaffRole(role){
-  return role === "admin" || role === "supervisor" || role === "ccar_facilitator";
+  return role === "admin" || role === "supervisor" || role === "ccar_facilitator" || role === "training_admin";
 }
 function roleScope(){
   const r = state.profile.role;
   if (r === "ccar_facilitator") return "ccar";
   if (r === "supervisor") return "supervisor";
+  if (r === "training_admin") return "group";
   return "admin";
 }
 function roleLabel(role){
   if (role === "admin") return "Admin";
   if (role === "supervisor") return "Supervisor";
   if (role === "ccar_facilitator") return "CCAR Facilitator";
+  if (role === "training_admin") return "Training Admin";
   return "Trainee";
 }
 function defaultViewForRole(role){
@@ -608,6 +614,7 @@ function traineeNav(){
     { id:"classes", label:"Class Catalog", ic:"☷" },
     { id:"certificates", label:"My Certificates", ic:"⌘" },
     { id:"recert", label:"Recertification", ic:"↻" },
+    { id:"profile", label:"My Profile", ic:"☺" },
   ];
 }
 function adminNav(){
@@ -621,12 +628,16 @@ function adminNav(){
 function supervisorNav(){
   return [ { id:"admin_trainees", label:"My Peer Coaches", ic:"▤" } ];
 }
+function groupNav(){
+  const g = (state.profile.employer||"").trim();
+  return [ { id:"admin_trainees", label: g ? `${g} Trainees` : "Trainees", ic:"▤" } ];
+}
 function facilitatorNav(){
   return [ { id:"admin_trainees", label:"CCAR Trainees", ic:"▤" } ];
 }
 function renderShell(){
   const role = state.profile.role;
-  const nav = role === "admin" ? adminNav() : role === "supervisor" ? supervisorNav() : role === "ccar_facilitator" ? facilitatorNav() : traineeNav();
+  const nav = role === "admin" ? adminNav() : role === "supervisor" ? supervisorNav() : role === "ccar_facilitator" ? facilitatorNav() : role === "training_admin" ? groupNav() : traineeNav();
   return `
   <div class="shell">
     <aside class="sidebar" id="sidebar">
@@ -689,7 +700,7 @@ function renderView(){
     if (state.view === "admin_trainees") return state.adminTraineeId ? renderAdminTraineeDetail() : renderAdminTrainees();
     return renderAdminDashboard();
   }
-  if (role === "supervisor" || role === "ccar_facilitator"){
+  if (role === "supervisor" || role === "ccar_facilitator" || role === "training_admin"){
     return state.adminTraineeId ? renderAdminTraineeDetail() : renderAdminTrainees();
   }
   if (state.view === "ohio") return renderPathway("ohio");
@@ -698,6 +709,7 @@ function renderView(){
   if (state.view === "classes") return renderClasses();
   if (state.view === "certificates") return renderCertificates();
   if (state.view === "recert") return renderRecert();
+  if (state.view === "profile") return renderProfile();
   return renderTraineeDashboard();
 }
 function wireView(){
@@ -708,7 +720,7 @@ function wireView(){
     if (state.view === "admin_trainees") return state.adminTraineeId ? wireAdminTraineeDetail() : wireAdminTrainees();
     return wireCommonStepActions(); // admin dashboard's "View all" link
   }
-  if (role === "supervisor" || role === "ccar_facilitator"){
+  if (role === "supervisor" || role === "ccar_facilitator" || role === "training_admin"){
     return state.adminTraineeId ? wireAdminTraineeDetail() : wireAdminTrainees();
   }
   if (state.view === "ohio") return wirePathway("ohio");
@@ -717,6 +729,7 @@ function wireView(){
   if (state.view === "classes") return wireClasses();
   if (state.view === "certificates") return wireCertificates();
   if (state.view === "recert") return wireRecert();
+  if (state.view === "profile") return wireProfile();
   wireCommonStepActions(); // trainee dashboard's "View checklist" links + mini checklist (no inputs there, safe no-op)
 }
 
@@ -1305,30 +1318,58 @@ function renderAdminDashboard(){
     </div>
   `;
 }
+function groupNames(){
+  const set = new Set();
+  [...state.adminData.trainees, ...(state.adminData.allStaff||[])].forEach(p=>{ const g=(p.employer||"").trim(); if (g) set.add(g); });
+  return [...set].sort((a,b)=>a.localeCompare(b));
+}
+function visibleTrainees(){
+  const f = (state.groupFilter||"").trim().toLowerCase();
+  if (state.profile.role !== "admin" || !f) return state.adminData.trainees;
+  if (f === "__none__") return state.adminData.trainees.filter(t=>!(t.employer||"").trim());
+  return state.adminData.trainees.filter(t=>(t.employer||"").trim().toLowerCase() === f);
+}
+function traineeSummary(t){
+  const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id && e.status==="completed");
+  const ce = state.adminData.allCeLogs.filter(l=>l.user_id===t.id);
+  const dates = [...enr.map(e=>e.completed_date), ...ce.map(l=>l.date_completed)].filter(Boolean).sort();
+  return { courses: enr.length, ceCount: ce.length, last: dates[dates.length-1] || null };
+}
 function renderAdminTrainees(){
   const scope = roleScope();
-  const trainees = state.adminData.trainees;
-  const heading = scope === "supervisor" ? "My Peer Coaches" : scope === "ccar" ? "CCAR Trainees" : "Trainees";
+  const trainees = visibleTrainees();
+  const heading = scope === "supervisor" ? "My Peer Coaches" : scope === "ccar" ? "CCAR Trainees" : scope === "group" ? `${(state.profile.employer||"").trim()||"Group"} Trainees` : "Trainees";
   return `
     <div class="page-head"><div><div class="eyebrow">People</div><h1>${heading}</h1></div>
-      ${canExportCsv() ? `<button class="btn btn-secondary" id="exportCsvBtn">Download CSV</button>` : ""}</div>
+      ${canExportCsv() ? `<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        ${state.profile.role==="admin" ? `<select id="groupFilter" style="max-width:220px;"><option value="">All groups</option>
+          ${groupNames().map(g=>`<option value="${escapeHtml(g)}" ${(state.groupFilter||"").toLowerCase()===g.toLowerCase()?"selected":""}>${escapeHtml(g)}</option>`).join("")}
+          <option value="__none__" ${state.groupFilter==="__none__"?"selected":""}>No group set</option></select>` : ""}
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="csvSteps" ${state.csvIncludeSteps?"checked":""}> Include application steps</label>
+        <button class="btn btn-secondary" id="exportCsvBtn">Download CSV (HRIS)</button></div>` : ""}</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Name</th><th>Email</th>${scope!=="ccar"?"<th>Ohio</th>":""}<th>CCAR hrs</th>${scope!=="ccar"?"<th>Recert</th>":""}<th></th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th><th>Job title</th><th>Employer</th><th>Employee ID</th><th>Courses done</th><th>Latest completion</th>${scope!=="ccar"?"<th>Ohio</th>":""}<th>CCAR hrs</th>${scope!=="ccar"?"<th>Recert</th>":""}<th></th></tr></thead>
       <tbody>${trainees.map(t=>{
         const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
         const enr = state.adminData.allEnrollments.filter(e=>e.user_id===t.id);
         const ohioClasses = state.data.classes.filter(c=>c.pathway==="ohio");
         const ohioDone = ohioClasses.filter(c=>enr.find(e=>e.class_id===c.id && e.status==="completed")).length;
         const ccarHrs = state.data.classes.filter(c=>c.pathway==="ccar").reduce((s,c)=> s + (enr.find(e=>e.class_id===c.id && e.status==="completed")?Number(c.hours):0),0);
+        const sm = traineeSummary(t);
         return `<tr>
-          <td><strong>${escapeHtml(t.full_name||"")}</strong></td>
+          <td><strong>${t.full_name ? escapeHtml(t.full_name) : `<span class="muted">${escapeHtml(displayName(t))} (no name yet)</span>`}</strong></td>
           <td>${escapeHtml(t.email||"")}</td>
+          <td>${escapeHtml(jobTitleOf(t))}</td>
+          <td>${escapeHtml(t.employer||"—")}</td>
+          <td>${escapeHtml(t.employee_id||"—")}</td>
+          <td class="num">${sm.courses}${sm.ceCount?` <span class="muted">+ ${sm.ceCount} CE</span>`:""}</td>
+          <td class="num">${fmtDate(sm.last)}</td>
           ${scope!=="ccar"?`<td class="num">${ohioDone}/${ohioClasses.length}</td>`:""}
           <td class="num">${ccarHrs}/${CCAR_TOTAL_HOURS}</td>
           ${scope!=="ccar"?`<td>${recert ? `<span class="pill ${daysUntil(recert.cycle_end_date)<90?'pill-warning':'pill-success'}">${fmtDate(recert.cycle_end_date)}</span>` : `<span class="pill pill-neutral">—</span>`}</td>`:""}
           <td><button class="btn btn-secondary btn-sm" data-open-trainee="${t.id}">View</button></td>
         </tr>`;
-      }).join("") || `<tr><td colspan="6" class="empty">No ${scope==='supervisor'?'peer coaches assigned yet':'trainees yet'}.</td></tr>`}</tbody>
+      }).join("") || `<tr><td colspan="11" class="empty">No ${scope==='supervisor'?'peer coaches assigned yet':'trainees yet'}.</td></tr>`}</tbody>
     </table></div>
   `;
 }
@@ -1346,8 +1387,13 @@ function renderAdminTraineeDetail(){
     : [...OHIO_MILESTONES.map(m=>({...m,pathway:'ohio'})), ...CCAR_MILESTONES.map(m=>({...m,pathway:'ccar'})), ...OHIO_SUPERVISOR_MILESTONES.map(m=>({...m,pathway:'ohio_supervisor'}))];
   return `
     <button class="btn btn-ghost btn-sm" id="backToTrainees" style="margin-bottom:14px;">← ${scope==='supervisor'?'My peer coaches':scope==='ccar'?'CCAR trainees':'All trainees'}</button>
-    <div class="page-head"><div><div class="eyebrow">${scope==='supervisor'?'Peer coach':'Trainee'}</div><h1>${escapeHtml(t.full_name||"")}</h1><p>${escapeHtml(t.email||"")}</p></div>
-      ${canExportCsv() ? `<button class="btn btn-secondary" id="exportTraineeCsvBtn">Download CSV</button>` : ""}</div>
+    <div class="page-head"><div><div class="eyebrow">${scope==='supervisor'?'Peer coach':'Trainee'}</div><h1>${escapeHtml(displayName(t))}</h1><p>${escapeHtml(t.email||"")}</p></div>
+      ${canExportCsv() ? `<button class="btn btn-secondary" id="exportTraineeCsvBtn">Download CSV (HRIS)</button>` : ""}</div>
+    <div class="card section">
+      <div class="section-title" style="margin-bottom:6px;"><h2>Profile and IDs</h2>
+        ${(state.profile.role==="admin" || state.profile.role==="training_admin") ? `<button class="btn btn-secondary btn-sm" id="editTraineeProfile">Edit</button>` : ""}</div>
+      ${profileFieldsHtml(t)}
+    </div>
     <div class="section">
       <div class="section-title"><h2>Class certificates</h2></div>
       <div class="table-wrap"><table>
@@ -1385,10 +1431,86 @@ function renderAdminTraineeDetail(){
     </div>` : ""}
   `;
 }
+// ---------- PROFILE (name, employer, IDs used for the HRIS export) ----------
+const JOB_TITLES = ["Trainee","Peer Coach","Peer Coach Supervisor","Other"];
+function jobTitleOf(p){ return p.job_title || "Trainee"; }
+function splitName(p){
+  if (p.first_name || p.last_name) return [p.first_name||"", p.last_name||""];
+  const parts = String(p.full_name||"").trim().split(/\s+/).filter(Boolean);
+  if (parts.length <= 1) return [parts[0]||"", ""];
+  return [parts.slice(0,-1).join(" "), parts[parts.length-1]];
+}
+function displayName(p){
+  return (p.full_name||"").trim() || (p.email ? p.email.split("@")[0] : "");
+}
+function profileFieldsHtml(p){
+  const rows = [
+    ["Name", displayName(p) || "—"],
+    ["Job title", jobTitleOf(p)],
+    ["Employer / group", p.employer || "—"],
+    ["Employee ID", p.employee_id || "—"],
+    ["Ohio certification number", p.ohio_cert_number || "—"],
+    ["CCAR certification number", p.ccar_cert_number || "—"],
+    ["CCAR issued", fmtDate(p.ccar_cert_issued)],
+    ["CCAR expires", fmtDate(p.ccar_cert_expires)],
+  ];
+  return rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);">
+    <span class="muted">${k}</span><strong>${escapeHtml(String(v))}</strong></div>`).join("");
+}
+function renderProfile(){
+  return `
+    <div class="page-head"><div><div class="eyebrow">Account</div><h1>My Profile</h1>
+      <p style="margin-top:6px;max-width:640px;">Your employer can use these details to match your training records in their HR system. Add your employee ID if you have one.</p></div></div>
+    <div class="card section">${profileFieldsHtml(state.profile)}
+      <div style="margin-top:14px;"><button class="btn btn-primary btn-sm" id="editProfileBtn">Edit profile</button></div></div>`;
+}
+function wireProfile(){
+  const b = document.getElementById("editProfileBtn");
+  if (b) b.onclick = ()=> openModal(profileModal(state.profile, true));
+}
+function profileModal(p, isSelf){
+  const [fn, ln] = splitName(p);
+  const v = x => escapeHtml(x||"");
+  return {
+    title: isSelf ? "Edit my profile" : "Edit profile",
+    body: `
+      <div class="grid grid-2">
+        <div class="field"><label>First name</label><input id="pFirst" value="${v(fn)}" required></div>
+        <div class="field"><label>Last name</label><input id="pLast" value="${v(ln)}" required></div>
+      </div>
+      <div class="field"><label>Job title</label><select id="pTitle">${JOB_TITLES.map(j=>`<option ${jobTitleOf(p)===j?"selected":""}>${j}</option>`).join("")}</select></div>
+      <div class="field"><label>Employer / group</label><input id="pEmployer" value="${v(p.employer)}" placeholder="For example, Thrive Peer Group"></div>
+      <div class="field"><label>Employee ID</label><input id="pEmpId" value="${v(p.employee_id)}"></div>
+      <div class="field"><label>Ohio certification number</label><input id="pOhioNo" value="${v(p.ohio_cert_number)}"></div>
+      <div class="field"><label>CCAR certification number</label><input id="pCcarNo" value="${v(p.ccar_cert_number)}"></div>
+      <div class="grid grid-2">
+        <div class="field"><label>CCAR issued</label><input type="date" id="pCcarIss" value="${p.ccar_cert_issued||""}"></div>
+        <div class="field"><label>CCAR expires</label><input type="date" id="pCcarExp" value="${p.ccar_cert_expires||""}"></div>
+      </div>`,
+    onSubmit: async ()=>{
+      const g = id => document.getElementById(id).value.trim();
+      const first_name = g("pFirst"), last_name = g("pLast");
+      if (!first_name || !last_name){ toast("Please enter first and last name.","err"); return; }
+      const patch = { first_name, last_name, full_name: `${first_name} ${last_name}`,
+        job_title: document.getElementById("pTitle").value, employer: g("pEmployer")||null, employee_id: g("pEmpId")||null,
+        ohio_cert_number: g("pOhioNo")||null, ccar_cert_number: g("pCcarNo")||null,
+        ccar_cert_issued: g("pCcarIss")||null, ccar_cert_expires: g("pCcarExp")||null };
+      try{
+        const res = await sb.from("profiles").update(patch).eq("id", p.id);
+        if (res.error) throw res.error;
+        if (isSelf) Object.assign(state.profile, patch);
+        else { const t = state.adminData.trainees.find(x=>x.id===p.id); if (t) Object.assign(t, patch); }
+        toast("Profile saved.");
+        closeModal(); render();
+      }catch(err){ toast(err.message || "Couldn't save","err"); }
+    }
+  };
+}
+
 // ---------- CSV EXPORT (admin only) ----------
 function canExportCsv(){
   const native = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
-  return state.profile.role === "admin" && !native;
+  return (state.profile.role === "admin" || state.profile.role === "training_admin") && !native;
 }
 function csvCell(v){
   let s = String(v ?? "");
@@ -1403,33 +1525,45 @@ function downloadCsv(filename, rows){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 1500);
 }
-const CSV_HEADER = ["Name","Email","Type","Course","Pathway or topic","Provider","Hours","Status","Start date","Date completed","Certificate on file"];
+const CSV_HEADER = ["Employee ID","First Name","Last Name","Email","Job Title","Employer","Record Type","Course or Credential","Provider","Category","Hours","Status","Start Date","Completion Date","Expiration Date","Credential Number","Certificate on File"];
 function courseRowsFor(t){
+  const [fn, ln] = splitName(t);
+  const who = [t.employee_id||"", fn, ln, t.email||"", jobTitleOf(t), t.employer||""];
   const rows = [];
   state.adminData.allEnrollments.filter(e=>e.user_id===t.id).forEach(e=>{
     const c = state.data.classes.find(x=>x.id===e.class_id);
-    rows.push([t.full_name||"", t.email||"", "Class", c?c.name:"(class removed)", c?c.pathway.toUpperCase():"", "Sharpe Pro Development",
-      c?c.hours:"", e.status==="completed"?"Completed":"Enrolled", e.start_date||"", e.completed_date||"", e.certificate_path?"Yes":"No"]);
+    rows.push([...who, "Training", c?c.name:"(class removed)", "Sharpe Pro Development", c?c.pathway.toUpperCase():"",
+      c?c.hours:"", e.status==="completed"?"Completed":"Enrolled", e.start_date||"", e.completed_date||"", "", "", e.certificate_path?"Yes":"No"]);
   });
   state.adminData.allCeLogs.filter(l=>l.user_id===t.id).forEach(l=>{
     const topic = CE_TOPICS.find(x=>x.key===l.topic_area)?.label || l.topic_area;
-    rows.push([t.full_name||"", t.email||"", "Continuing education", l.title, topic, l.provider||"",
-      l.hours, "Completed", "", l.date_completed||"", l.certificate_path?"Yes":"No"]);
+    rows.push([...who, "Continuing education", l.title, l.provider||"", topic,
+      l.hours, "Completed", "", l.date_completed||"", "", "", l.certificate_path?"Yes":"No"]);
   });
-  state.adminData.allMilestones.filter(m=>m.user_id===t.id && m.completed).forEach(m=>{
-    const def = milestoneDefFor(m.pathway, m.milestone_key);
-    const pw = m.pathway==="ohio_supervisor" ? "OHIO SUPERVISOR" : String(m.pathway).toUpperCase();
-    rows.push([t.full_name||"", t.email||"", "Application / pathway step", def?def.label:m.milestone_key, pw, "",
-      "", "Completed", "", m.completed_date||"", ""]);
-  });
-  return rows.sort((a,b)=> String(a[9]).localeCompare(String(b[9])));
+  const recert = state.adminData.allRecert.find(r=>r.user_id===t.id);
+  if (recert || t.ohio_cert_number){
+    rows.push([...who, "Credential", "Ohio Certified Peer Recovery Supporter", "Ohio Department of Behavioral Health", "OHIO",
+      "", "Active", "", recert?.cert_date||"", recert?.cycle_end_date||"", t.ohio_cert_number||"", ""]);
+  }
+  if (t.ccar_cert_number || t.ccar_cert_issued){
+    rows.push([...who, "Credential", "CCAR Recovery Coach Professional (RCP)", "CCAR", "CCAR",
+      "", "Active", "", t.ccar_cert_issued||"", t.ccar_cert_expires||"", t.ccar_cert_number||"", ""]);
+  }
+  if (state.csvIncludeSteps){
+    state.adminData.allMilestones.filter(m=>m.user_id===t.id && m.completed).forEach(m=>{
+      const def = milestoneDefFor(m.pathway, m.milestone_key);
+      const pw = m.pathway==="ohio_supervisor" ? "OHIO SUPERVISOR" : String(m.pathway).toUpperCase();
+      rows.push([...who, "Application step", def?def.label:m.milestone_key, "", pw, "", "Completed", "", m.completed_date||"", "", "", ""]);
+    });
+  }
+  return rows.sort((a,b)=> String(a[13]).localeCompare(String(b[13])));
 }
 function exportAllCoursesCsv(){
   const rows = [];
-  [...state.adminData.trainees].sort((a,b)=>(a.full_name||"").localeCompare(b.full_name||""))
+  [...visibleTrainees()].sort((a,b)=>(a.full_name||"").localeCompare(b.full_name||""))
     .forEach(t=> rows.push(...courseRowsFor(t)));
   if (!rows.length){ toast("No courses recorded yet.","err"); return; }
-  downloadCsv(`sharpe-pro-courses-${new Date().toISOString().slice(0,10)}.csv`, [CSV_HEADER, ...rows]);
+  downloadCsv(`sharpe-pro-courses${state.groupFilter && state.groupFilter!=="__none__" ? "-"+state.groupFilter.toLowerCase().replace(/[^a-z0-9]+/g,"-") : ""}-${new Date().toISOString().slice(0,10)}.csv`, [CSV_HEADER, ...rows]);
 }
 function exportTraineeCoursesCsv(t){
   const rows = courseRowsFor(t);
@@ -1441,6 +1575,10 @@ function exportTraineeCoursesCsv(t){
 function wireAdminTrainees(){
   const exp = document.getElementById("exportCsvBtn");
   if (exp) exp.onclick = exportAllCoursesCsv;
+  const gf = document.getElementById("groupFilter");
+  if (gf) gf.onchange = ()=>{ state.groupFilter = gf.value; renderContent(); };
+  const stepsBox = document.getElementById("csvSteps");
+  if (stepsBox) stepsBox.onchange = ()=>{ state.csvIncludeSteps = stepsBox.checked; };
   document.querySelectorAll("[data-open-trainee]").forEach(b=>{
     b.onclick = ()=>{ state.adminTraineeId = b.dataset.openTrainee; renderContent(); };
   });
@@ -1454,6 +1592,11 @@ function wireAdminTraineeDetail(){
   if (expOne) expOne.onclick = ()=>{
     const t = state.adminData.trainees.find(x=>x.id===state.adminTraineeId);
     if (t) exportTraineeCoursesCsv(t);
+  };
+  const editP = document.getElementById("editTraineeProfile");
+  if (editP) editP.onclick = ()=>{
+    const t = state.adminData.trainees.find(x=>x.id===state.adminTraineeId);
+    if (t) openModal(profileModal(t, false));
   };
   document.querySelectorAll("[data-view-cert]").forEach(el=>{
     el.onclick = async (e)=>{
@@ -1556,9 +1699,14 @@ function renderAdminStaff(){
           <select id="promoteRoleSelect">
             <option value="supervisor">Supervisor</option>
             <option value="ccar_facilitator">CCAR Facilitator</option>
-            <option value="admin">Admin</option>
+            <option value="training_admin">Training Admin (sees one group only)</option>
+            <option value="admin">Admin (sees everyone)</option>
           </select>
         </div>
+        <div class="field" id="promoteGroupField" style="display:none;"><label>Group they can see</label>
+          <input id="promoteGroupInput" list="groupList" placeholder="For example, Thrive Peer Group">
+          <datalist id="groupList">${groupNames().map(g=>`<option value="${escapeHtml(g)}">`).join("")}</datalist>
+          <div class="hint">They will see only trainees whose employer matches this name exactly (capital letters don't matter).</div></div>
         <button class="btn btn-primary btn-sm" id="promoteBtn">Update role</button>
       </div>
     </div>
@@ -1568,7 +1716,7 @@ function renderAdminStaff(){
         <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
         <tbody>${staff.map(s=>`<tr>
           <td><strong>${escapeHtml(s.full_name||"")}</strong></td><td>${escapeHtml(s.email||"")}</td>
-          <td><span class="pill pill-brand">${roleLabel(s.role)}</span></td>
+          <td><span class="pill pill-brand">${roleLabel(s.role)}</span>${s.role==="training_admin" ? ` <span class="muted">${escapeHtml(s.employer||"No group set")}</span>` : ""}</td>
           <td>${s.id===state.profile.id?"":`<button class="btn btn-ghost btn-sm" data-demote="${s.id}">Set back to trainee</button>`}</td>
         </tr>`).join("") || `<tr><td colspan="4" class="empty">No staff accounts yet besides you.</td></tr>`}</tbody>
       </table></div>
@@ -1594,11 +1742,20 @@ function renderAdminStaff(){
 }
 function wireAdminStaff(){
   const promoteBtn = document.getElementById("promoteBtn");
+  const roleSel = document.getElementById("promoteRoleSelect");
+  const groupField = document.getElementById("promoteGroupField");
+  if (roleSel) roleSel.onchange = ()=>{ groupField.style.display = roleSel.value==="training_admin" ? "" : "none"; };
   if (promoteBtn) promoteBtn.onclick = async ()=>{
     const uid = document.getElementById("promoteUserSelect").value;
     const role = document.getElementById("promoteRoleSelect").value;
     if (!uid){ toast("Pick a trainee first","err"); return; }
-    const { error } = await sb.from("profiles").update({ role }).eq("id", uid);
+    const patch = { role };
+    if (role === "training_admin"){
+      const group = document.getElementById("promoteGroupInput").value.trim();
+      if (!group){ toast("Enter the group this Training Admin can see.","err"); return; }
+      patch.employer = group;
+    }
+    const { error } = await sb.from("profiles").update(patch).eq("id", uid);
     if (error){ toast(error.message,"err"); return; }
     await loadAdminData();
     toast("Role updated.");
